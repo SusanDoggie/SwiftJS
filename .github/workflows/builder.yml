@@ -49,6 +49,6 @@ jobs:
     - name: Install dependencies
       run: apt-get -q update && apt-get -y install libjavascriptcoregtk-1.0-dev
     - name: Build
-      run: swift build -c release
+      run: swift build -c release --enable-test-discovery
     - name: Run tests
       run: swift test -c release --enable-test-discovery
