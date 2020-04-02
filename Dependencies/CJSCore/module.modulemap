@@ -1,6 +1,0 @@
-module CJSCore [system] {
-    header "/usr/include/webkitgtk-4.0/JavaScriptCore/JavaScript.h"
-    header "jscore_c.h"
-    link "javascriptcore"
-    export *
-}

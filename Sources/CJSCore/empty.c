@@ -1,6 +1,5 @@
-// swift-tools-version:5.1
 //
-//  Package.swift
+//  empty.c
 //
 //  The MIT License
 //  Copyright (c) 2015 - 2020 Susan Cheng. All rights reserved.
@@ -23,52 +22,3 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 //  THE SOFTWARE.
 //
-
-import PackageDescription
-
-var targets: [Target] = []
-
-#if os(Linux)
-
-targets.append(
-    .target(
-        name: "CJSCore",
-        dependencies: []
-    )
-)
-targets.append(
-    .target(
-        name: "SwiftJS",
-        dependencies: [
-            "CJSCore",
-        ],
-        cSettings: [
-            .unsafeFlags(["-I/usr/include/webkitgtk-1.0/JavaScriptCore"]),
-        ],
-        cxxSettings: [
-            .unsafeFlags(["-I/usr/include/webkitgtk-1.0/JavaScriptCore"]),
-        ],
-        swiftSettings: [
-            .unsafeFlags(["-I/usr/include/webkitgtk-1.0/JavaScriptCore"]),
-        ]
-    )
-)
-
-#else
-
-targets.append(
-    .target(
-        name: "SwiftJS",
-        dependencies: []
-    )
-)
-
-#endif
-
-let package = Package(
-    name: "SwiftJS",
-    products: [
-        .library(name: "SwiftJS", targets: ["SwiftJS"]),
-    ],
-    targets: targets
-)
