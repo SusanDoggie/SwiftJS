@@ -1,4 +1,4 @@
 #!/bin/bash
 set -e
 
-apt-get -y install libwebkitgtk-dev
+apt-get -y install libjavascriptcoregtk-1.0-dev
