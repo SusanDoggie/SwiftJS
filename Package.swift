@@ -30,7 +30,7 @@ var targets: [Target] = []
 
 #if os(Linux)
 
-targets.append(.target(name: "CJSCore", dependencies: []))
+targets.append(.target(name: "CJSCore", dependencies: [], path: "./Dependencies/CJSCore"))
 targets.append(.target(name: "SwiftJS", dependencies: ["CJSCore"]))
 
 #else
