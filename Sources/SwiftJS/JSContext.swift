@@ -23,14 +23,32 @@
 //  THE SOFTWARE.
 //
 
-#if canImport(Linux)
+#if canImport(JavaScriptCore)
+
+import JavaScriptCore
+
+#else
+
+import CJSCore
+
+#endif
 
 public class JSContext {
     
+    public let virtualMachine: JSVirtualMachine
+    
     let context: JSContextRef
     
+    public convenience init() {
+        self.init(virtualMachine: JSVirtualMachine())
+    }
     
+    public init(virtualMachine: JSVirtualMachine) {
+        self.virtualMachine = virtualMachine
+        self.context = JSGlobalContextCreateInGroup(virtualMachine.group, nil)
+    }
     
+    deinit {
+        JSGlobalContextRelease(context)
+    }
 }
-
-#endif

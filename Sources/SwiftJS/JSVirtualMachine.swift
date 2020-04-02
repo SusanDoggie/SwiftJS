@@ -1,5 +1,5 @@
 //
-//  Exported.swift
+//  JSVirtualMachine.swift
 //
 //  The MIT License
 //  Copyright (c) 2015 - 2020 Susan Cheng. All rights reserved.
@@ -23,4 +23,25 @@
 //  THE SOFTWARE.
 //
 
-@_exported import Foundation
+#if canImport(JavaScriptCore)
+
+import JavaScriptCore
+
+#else
+
+import CJSCore
+
+#endif
+
+public class JSVirtualMachine {
+    
+    let group: JSContextGroupRef
+    
+    public init() {
+        self.group = JSContextGroupCreate()
+    }
+    
+    deinit {
+        JSContextGroupRelease(group)
+    }
+}
