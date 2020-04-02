@@ -1,0 +1,4 @@
+#!/bin/bash
+set -e
+
+apt-get -y install libwebkitgtk-dev
