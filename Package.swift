@@ -43,13 +43,13 @@ targets.append(
             "CJSCore",
         ],
         cSettings: [
-            .unsafeFlags(["-I/usr/include/webkitgtk-1.0/JavaScriptCore"]),
+            .unsafeFlags(["-I/usr/include/webkitgtk-1.0"]),
         ],
         cxxSettings: [
-            .unsafeFlags(["-I/usr/include/webkitgtk-1.0/JavaScriptCore"]),
+            .unsafeFlags(["-I/usr/include/webkitgtk-1.0"]),
         ],
         swiftSettings: [
-            .unsafeFlags(["-I/usr/include/webkitgtk-1.0/JavaScriptCore"]),
+            .unsafeFlags(["-I/usr/include/webkitgtk-1.0"]),
         ]
     )
 )
