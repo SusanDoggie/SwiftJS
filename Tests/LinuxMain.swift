@@ -1,6 +1,5 @@
-// swift-tools-version:5.1
 //
-//  Package.swift
+//  LinuxMain.swift
 //
 //  The MIT License
 //  Copyright (c) 2015 - 2020 Susan Cheng. All rights reserved.
@@ -24,52 +23,4 @@
 //  THE SOFTWARE.
 //
 
-import PackageDescription
-
-var targets: [Target] = []
-
-#if os(Linux)
-
-targets.append(
-    .target(
-        name: "CJSCore",
-        dependencies: []
-    )
-)
-targets.append(
-    .target(
-        name: "SwiftJS",
-        dependencies: [
-            "CJSCore",
-        ],
-        cSettings: [
-            .unsafeFlags(["-I/usr/include/webkitgtk-1.0"]),
-        ]
-    )
-)
-
-#else
-
-targets.append(
-    .target(
-        name: "SwiftJS",
-        dependencies: []
-    )
-)
-
-#endif
-
-targets.append(
-    .testTarget(
-        name: "SwiftJSTests",
-        dependencies: ["SwiftJS"]
-    )
-)
-
-let package = Package(
-    name: "SwiftJS",
-    products: [
-        .library(name: "SwiftJS", targets: ["SwiftJS"]),
-    ],
-    targets: targets
-)
+fatalError("Use --enable-test-discovery to run tests on Linux.")
