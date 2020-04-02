@@ -1,0 +1,17 @@
+name: Builder
+on: [push, pull_request]
+jobs:
+  build:
+    name: ${{ matrix.image }}
+    container: 
+      image: docker://swift:${{ matrix.image }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        image: [xenial, bionic]
+    steps:
+    - uses: actions/checkout@v1
+      with:
+        submodules: recursive
+    - name: Build
+      run: swift build -v
