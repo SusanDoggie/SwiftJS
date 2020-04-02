@@ -47,7 +47,7 @@ jobs:
       with:
         submodules: recursive
     - name: Install WebKit
-      run: apt-get -q update && apt-get -y install libwebkitgtk-dev
+      run: apt-get -q update && apt-get -y install libjavascriptcoregtk-1.0-dev
     - name: Build
       run: swift build -c release
     - name: Run tests
