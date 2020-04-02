@@ -13,5 +13,7 @@ jobs:
     - uses: actions/checkout@v1
       with:
         submodules: recursive
+    - name: Install WebKit
+      run: apt-get -q update && apt-get -y install libwebkitgtk-dev
     - name: Build
       run: swift build -v
