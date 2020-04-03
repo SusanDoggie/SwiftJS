@@ -149,6 +149,8 @@ class SwiftJSTest: XCTestCase {
             XCTAssertTrue(result.isObject)
             XCTAssertEqual(result.value(forProperty: "result").doubleValue, 3)
             
+            XCTAssertTrue(result.isInstance(of: myClass))
+            
         } catch let error {
             
             XCTFail("\((error as? JSObject)?.value(forProperty: "message") ?? error)")

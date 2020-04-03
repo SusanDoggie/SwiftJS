@@ -127,6 +127,31 @@ extension JSObject {
             info.deallocate()
         }
         
+        def.callAsConstructor = { _, object, argumentCount, arguments, exception in
+            
+            let info = JSObjectGetPrivate(object).assumingMemoryBound(to: CallbackInfo.self)
+            
+            let context = info.pointee.context
+            
+            let arguments = (0..<argumentCount).map { JSObject(context: context, object: arguments![$0]!) }
+            
+            let result = info.pointee.callback(context, nil, arguments)
+            
+            switch result {
+            case let .success(value):
+                
+                let prototype = JSObjectGetPrototype(context.context, object)
+                JSObjectSetPrototype(context.context, value.object, prototype)
+                
+                return value.object
+                
+            case let .failure(error):
+                
+                exception?.pointee = error.object
+                return nil
+            }
+        }
+        
         def.callAsFunction = { _, object, thisObject, argumentCount, arguments, exception in
             
             let info = JSObjectGetPrivate(object).assumingMemoryBound(to: CallbackInfo.self)
@@ -150,26 +175,16 @@ extension JSObject {
             }
         }
         
-        def.callAsConstructor = { _, object, argumentCount, arguments, exception in
+        def.hasInstance = { _, constructor, possibleInstance, exception in
             
-            let info = JSObjectGetPrivate(object).assumingMemoryBound(to: CallbackInfo.self)
+            let info = JSObjectGetPrivate(constructor).assumingMemoryBound(to: CallbackInfo.self)
             
             let context = info.pointee.context
             
-            let arguments = (0..<argumentCount).map { JSObject(context: context, object: arguments![$0]!) }
+            let prototype_0 = JSObjectGetPrototype(context.context, constructor)
+            let prototype_1 = JSObjectGetPrototype(context.context, possibleInstance)
             
-            let result = info.pointee.callback(context, nil, arguments)
-            
-            switch result {
-            case let .success(value):
-                
-                return value.object
-                
-            case let .failure(error):
-                
-                exception?.pointee = error.object
-                return nil
-            }
+            return JSValueIsStrictEqual(context.context, prototype_0, prototype_1)
         }
         
         let _class = JSClassCreate(&def)
