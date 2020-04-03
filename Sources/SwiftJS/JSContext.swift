@@ -80,7 +80,7 @@ extension JSContext {
         return result
     }
     
-    public func evaluateScript(_ script: String, thisObject: JSObjectRef? = nil, sourceURL: URL? = nil, startingLineNumber: Int = 0) throws -> JSObject {
+    @discardableResult public func evaluateScript(_ script: String, thisObject: JSObjectRef? = nil, sourceURL: URL? = nil, startingLineNumber: Int = 0) throws -> JSObject {
         
         let script = script.withCString(JSStringCreateWithUTF8CString)
         defer { JSStringRelease(script) }

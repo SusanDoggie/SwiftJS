@@ -157,6 +157,10 @@ extension JSObject: CustomStringConvertible {
             return "\((0..<count).map(self.value))"
         }
         
+        if self.isFunction {
+            return "function"
+        }
+        
         if self.isObject {
             
             var object: [String: JSObject] = [:]
@@ -168,7 +172,7 @@ extension JSObject: CustomStringConvertible {
             return "\(object)"
         }
         
-        return "unknown"
+        return "object"
     }
 }
 
@@ -245,15 +249,9 @@ extension JSObject {
     }
     
     public var stringValue: String? {
-        
-        var exception: JSObjectRef?
-        
-        let str = JSValueToStringCopy(context.context, object, &exception)
-        defer { JSStringRelease(str) }
-        
-        guard exception == nil else { return nil }
-        
-        return String(str!)
+        let str = JSValueToStringCopy(context.context, object, nil)
+        defer { str.map(JSStringRelease) }
+        return str.map(String.init)
     }
     
 }
