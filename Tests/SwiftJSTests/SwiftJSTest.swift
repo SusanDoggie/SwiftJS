@@ -74,7 +74,7 @@ class SwiftJSTest: XCTestCase {
         
         do {
             
-            let myFunction = JSObject(function: "myFunction", in: context) { context, this, arguments in
+            let myFunction = JSObject(newFunctionIn: context) { context, this, arguments in
                 
                 let result = arguments[0].doubleValue! + arguments[1].doubleValue!
                 
@@ -82,6 +82,8 @@ class SwiftJSTest: XCTestCase {
             }
             
             XCTAssertTrue(myFunction.isFunction)
+            
+            context.globalObject.setValue(myFunction, forProperty: "myFunction")
             
             let result = try myFunction.call(withArguments: [JSObject(double: 1, in: context), JSObject(double: 2, in: context)])
             
@@ -100,7 +102,7 @@ class SwiftJSTest: XCTestCase {
         
         do {
             
-            let myFunction = JSObject(function: "myFunction", in: context) { context, this, arguments in
+            let myFunction = JSObject(newFunctionIn: context) { context, this, arguments in
                 
                 let result = arguments[0].doubleValue! + arguments[1].doubleValue!
                 
@@ -108,6 +110,8 @@ class SwiftJSTest: XCTestCase {
             }
             
             XCTAssertTrue(myFunction.isFunction)
+            
+            context.globalObject.setValue(myFunction, forProperty: "myFunction")
             
             let result = try context.evaluateScript("myFunction(1, 2)")
             
@@ -126,7 +130,7 @@ class SwiftJSTest: XCTestCase {
         
         do {
             
-            let myFunction = JSObject(function: "myClass", in: context) { context, this, arguments in
+            let myClass = JSObject(newFunctionIn: context) { context, this, arguments in
                 
                 let result = arguments[0].doubleValue! + arguments[1].doubleValue!
                 
@@ -136,7 +140,9 @@ class SwiftJSTest: XCTestCase {
                 return .success(object)
             }
             
-            XCTAssertTrue(myFunction.isFunction)
+            XCTAssertTrue(myClass.isConstructor)
+            
+            context.globalObject.setValue(myClass, forProperty: "myClass")
             
             let result = try context.evaluateScript("new myClass(1, 2)")
             

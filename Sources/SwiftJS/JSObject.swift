@@ -101,47 +101,6 @@ extension JSObject {
     }
 }
 
-extension JSObject {
-    
-    public convenience init(function name: String?,
-                            parameters: [String],
-                            body: String,
-                            sourceURL: URL? = nil,
-                            startingLineNumber: Int = 0,
-                            in context: JSContext) throws {
-        
-        let name = name?.withCString(JSStringCreateWithUTF8CString)
-        defer { name.map(JSStringRelease) }
-        
-        let parameters = parameters.map { $0.withCString(JSStringCreateWithUTF8CString) }
-        defer { parameters.forEach(JSStringRelease) }
-        
-        let body = body.withCString(JSStringCreateWithUTF8CString)
-        defer { JSStringRelease(body) }
-        
-        let sourceURL = sourceURL?.path.withCString(JSStringCreateWithUTF8CString)
-        defer { sourceURL.map(JSStringRelease) }
-        
-        var exception: JSObjectRef?
-        
-        let object = JSObjectMakeFunction(
-            context.context,
-            name,
-            UInt32(parameters.count),
-            parameters.isEmpty ? nil : parameters,
-            body,
-            sourceURL,
-            Int32(startingLineNumber),
-            &exception
-        )
-        
-        if let exception = exception { throw JSObject(context: context, object: exception) }
-        
-        self.init(context: context, object: object!)
-    }
-    
-}
-
 public typealias JSObjectCallAsFunctionCallback = (JSContext, JSObject?, [JSObject]) -> Result<JSObject, JSObject>
 
 extension JSObject {
@@ -153,9 +112,7 @@ extension JSObject {
         let callback: JSObjectCallAsFunctionCallback
     }
     
-    public convenience init(function name: String?,
-                            in context: JSContext,
-                            callback: @escaping JSObjectCallAsFunctionCallback) {
+    public convenience init(newFunctionIn context: JSContext, callback: @escaping JSObjectCallAsFunctionCallback) {
         
         let info: UnsafeMutablePointer<CallbackInfo> = .allocate(capacity: 1)
         info.initialize(to: CallbackInfo(context: context, callback: callback))
@@ -219,10 +176,6 @@ extension JSObject {
         defer { JSClassRelease(_class) }
         
         self.init(context: context, object: JSObjectMake(context.context, _class, info))
-        
-        if let name = name {
-            context.globalObject.setValue(self, forProperty: name)
-        }
     }
 }
 
