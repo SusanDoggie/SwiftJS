@@ -150,7 +150,7 @@ extension JSObject: CustomStringConvertible {
         if self.isNull { return "null" }
         if self.isBoolean { return "\(self.boolValue)" }
         if self.isNumber { return "\(self.doubleValue!)" }
-        if self.isString { return "\(self.stringValue!)" }
+        if self.isString { return "\"\(self.stringValue!.unicodeScalars.reduce(into: "") { $0 += $1.escaped(asASCII: false) })\"" }
         
         if self.isArray {
             let count = Int(self.value(forProperty: "length").doubleValue ?? 0)
@@ -285,14 +285,23 @@ extension JSObject {
 
 extension JSObject {
     
-    public func isEqual(to other: JSObject) -> Bool {
+    /// Tests whether two JavaScript values are strict equal, as compared by the JS `===` operator.
+    /// - Parameter other: The other value to be compare.
+    /// - Returns: true if the two values are strict equal; otherwise false.
+    public func isEquåal(to other: JSObject) -> Bool {
         return JSValueIsStrictEqual(context.context, object, other.object)
     }
     
+    /// Tests whether two JavaScript values are equal, as compared by the JS `==` operator.
+    /// - Parameter other: The other value to be compare.
+    /// - Returns: true if the two values are equal; false if they are not equal or an exception is thrown.
     public func isEqualWithTypeCoercion(to other: JSObject) -> Bool {
         return JSValueIsEqual(context.context, object, other.object, nil)
     }
     
+    /// Tests whether a JavaScript value is an object constructed by a given constructor, as compared by the `isInstance(of:)` operator.
+    /// - Parameter other: The constructor to test against.
+    /// - Returns: true if the value is an object constructed by constructor, as compared by the JS isInstance(of:) operator; otherwise false.
     public func isInstance(of other: JSObject) -> Bool {
         return JSValueIsInstanceOfConstructor(context.context, object, other.object, nil)
     }
@@ -300,6 +309,7 @@ extension JSObject {
 
 extension JSObject {
     
+    /// Get the names of an object’s enumerable properties.
     public var propertyNames: [String] {
         
         let _list = JSObjectCopyPropertyNames(context.context, object)
@@ -312,18 +322,27 @@ extension JSObject {
         return list.map(String.init)
     }
     
+    /// Tests whether an object has a given property.
+    /// - Parameter property: A the property's name.
+    /// - Returns: true if the object has `property`, otherwise false.
     public func hasProperty(_ property: String) -> Bool {
         let property = property.withCString(JSStringCreateWithUTF8CString)
         defer { JSStringRelease(property) }
         return JSObjectHasProperty(context.context, object, property)
     }
     
-    public func deleteProperty(_ property: String) -> Bool {
+    /// Deletes a property from an object.
+    /// - Parameter property: A the property's name.
+    /// - Returns: true if the delete operation succeeds, otherwise false.
+    @discardableResult public func deleteProperty(_ property: String) -> Bool {
         let property = property.withCString(JSStringCreateWithUTF8CString)
         defer { JSStringRelease(property) }
         return JSObjectDeleteProperty(context.context, object, property, nil)
     }
     
+    /// Get the property value.
+    /// - Parameter property: A the property's name.
+    /// - Returns: The property's value if object has the property, otherwise the undefined value.
     public func value(forProperty property: String) -> JSObject {
         let property = JSStringCreateWithUTF8CString(property)
         defer { JSStringRelease(property) }
@@ -331,17 +350,28 @@ extension JSObject {
         return JSObject(context: context, object: result!)
     }
     
+    /// Set a property value.
+    /// - Parameters:
+    ///   - value: Value for the property.
+    ///   - property: A the property's name.
     public func setValue(_ value: JSObject, forProperty property: String) {
         let property = JSStringCreateWithUTF8CString(property)
         defer { JSStringRelease(property) }
         JSObjectSetProperty(context.context, object, property, value.object, 0, nil)
     }
     
+    /// Get the value at index
+    /// - Parameter index: The index value.
+    /// - Returns: The value if object exists, otherwise the undefined value.
     public func value(at index: Int) -> JSObject {
         let result = JSObjectGetPropertyAtIndex(context.context, object, UInt32(index), nil)
         return JSObject(context: context, object: result!)
     }
     
+    /// Set a value at index.
+    /// - Parameters:
+    ///   - value: The value to set.
+    ///   - index: The index value.
     public func setValue(_ value: JSObject, at index: Int) {
         JSObjectSetPropertyAtIndex(context.context, object, UInt32(index), value.object, nil)
     }
