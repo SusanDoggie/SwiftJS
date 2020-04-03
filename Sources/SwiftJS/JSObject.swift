@@ -251,7 +251,7 @@ extension JSObject {
         
         var exception: JSObjectRef?
         
-        let result = JSObjectCallAsFunction(context.context, object, nil, arguments.count, arguments.map { $0.object }, &exception)
+        let result = JSObjectCallAsFunction(context.context, object, nil, arguments.count, arguments.isEmpty ? nil : arguments.map { $0.object }, &exception)
         
         if let exception = exception { throw JSObject(context: context, object: exception) }
         
@@ -262,7 +262,7 @@ extension JSObject {
         
         var exception: JSObjectRef?
         
-        let result = JSObjectCallAsConstructor(context.context, object, arguments.count, arguments.map { $0.object }, &exception)
+        let result = JSObjectCallAsConstructor(context.context, object, arguments.count, arguments.isEmpty ? nil : arguments.map { $0.object }, &exception)
         
         if let exception = exception { throw JSObject(context: context, object: exception) }
         
@@ -275,7 +275,7 @@ extension JSObject {
         
         var exception: JSObjectRef?
         
-        let result = JSObjectCallAsFunction(context.context, method.object, object, arguments.count, arguments.map { $0.object }, &exception)
+        let result = JSObjectCallAsFunction(context.context, method.object, object, arguments.count, arguments.isEmpty ? nil : arguments.map { $0.object }, &exception)
         
         if let exception = exception { throw JSObject(context: context, object: exception) }
         
