@@ -8,6 +8,8 @@
 [![Swift](https://img.shields.io/badge/swift-5.1-orange.svg?style=flat)](https://swift.org)
 [![MIT](https://img.shields.io/badge/license-MIT-blue.svg?style=flat)](LICENSE)
 
+A cross platform Javascript engine for Swift.
+
 ## Build Status
 
 | | **Build Tool** | **Master** |
