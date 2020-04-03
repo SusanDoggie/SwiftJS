@@ -16,3 +16,15 @@
 | **macOS**        | **SwiftPM** | [![Build Status](https://travis-matrix-badges.herokuapp.com/repos/SusanDoggie/SwiftJS/branches/master/2)](https://travis-ci.com/SusanDoggie/SwiftJS)|
 | **Ubuntu 16.04** | **SwiftPM** | [![Build Status](https://travis-matrix-badges.herokuapp.com/repos/SusanDoggie/SwiftJS/branches/master/3)](https://travis-ci.com/SusanDoggie/SwiftJS)|
 | **Ubuntu 18.04** | **SwiftPM** | [![Build Status](https://travis-matrix-badges.herokuapp.com/repos/SusanDoggie/SwiftJS/branches/master/4)](https://travis-ci.com/SusanDoggie/SwiftJS)|
+
+## System Requirements
+
+### Ubuntu
+
+For Ubuntu, you need to install JavaScriptCore
+
+    apt-get -y install libjavascriptcoregtk-1.0-dev
+
+## Contributing
+
+To contribute a feature, please [create an issue](https://github.com/SusanDoggie/SwiftJS/issues/new) or [make a pull request](https://github.com/SusanDoggie/SwiftJS/compare).
