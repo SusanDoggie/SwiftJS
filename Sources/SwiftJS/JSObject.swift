@@ -142,6 +142,90 @@ extension JSObject {
     
 }
 
+public typealias JSObjectCallAsFunctionCallback = (JSContext, JSObject?, [JSObject]) -> Result<JSObject, JSObject>
+
+extension JSObject {
+    
+    private struct CallbackInfo {
+        
+        unowned let context: JSContext
+        
+        let callback: JSObjectCallAsFunctionCallback
+    }
+    
+    public convenience init(function name: String?,
+                            in context: JSContext,
+                            callback: @escaping JSObjectCallAsFunctionCallback) {
+        
+        let info: UnsafeMutablePointer<CallbackInfo> = .allocate(capacity: 1)
+        info.initialize(to: CallbackInfo(context: context, callback: callback))
+        
+        var def = JSClassDefinition()
+        
+        def.finalize = { object in
+            
+            let info = JSObjectGetPrivate(object).assumingMemoryBound(to: CallbackInfo.self)
+            
+            info.deinitialize(count: 1)
+            info.deallocate()
+        }
+        
+        def.callAsFunction = { _, object, thisObject, argumentCount, arguments, exception in
+            
+            let info = JSObjectGetPrivate(object).assumingMemoryBound(to: CallbackInfo.self)
+            
+            let context = info.pointee.context
+            
+            let thisObject = thisObject.map { JSObject(context: context, object: $0) }
+            let arguments = (0..<argumentCount).map { JSObject(context: context, object: arguments![$0]!) }
+            
+            let result = info.pointee.callback(context, thisObject, arguments)
+            
+            switch result {
+            case let .success(value):
+                
+                return value.object
+                
+            case let .failure(error):
+                
+                exception?.pointee = error.object
+                return nil
+            }
+        }
+        
+        def.callAsConstructor = { _, object, argumentCount, arguments, exception in
+            
+            let info = JSObjectGetPrivate(object).assumingMemoryBound(to: CallbackInfo.self)
+            
+            let context = info.pointee.context
+            
+            let arguments = (0..<argumentCount).map { JSObject(context: context, object: arguments![$0]!) }
+            
+            let result = info.pointee.callback(context, nil, arguments)
+            
+            switch result {
+            case let .success(value):
+                
+                return value.object
+                
+            case let .failure(error):
+                
+                exception?.pointee = error.object
+                return nil
+            }
+        }
+        
+        let _class = JSClassCreate(&def)
+        defer { JSClassRelease(_class) }
+        
+        self.init(context: context, object: JSObjectMake(context.context, _class, info))
+        
+        if let name = name {
+            context.globalObject.setValue(self, forProperty: name)
+        }
+    }
+}
+
 extension JSObject: CustomStringConvertible {
     
     public var description: String {

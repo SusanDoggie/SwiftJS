@@ -41,8 +41,7 @@ class SwiftJSTest: XCTestCase {
             
         } catch let error {
             
-            print(error)
-            XCTFail()
+            XCTFail("\((error as? JSObject)?.value(forProperty: "message") ?? error)")
         }
     }
     
@@ -65,8 +64,88 @@ class SwiftJSTest: XCTestCase {
             
         } catch let error {
             
-            print(error)
-            XCTFail()
+            XCTFail("\((error as? JSObject)?.value(forProperty: "message") ?? error)")
+        }
+    }
+    
+    func testFunction1() {
+        
+        let context = JSContext()
+        
+        do {
+            
+            let myFunction = JSObject(function: "myFunction", in: context) { context, this, arguments in
+                
+                let result = arguments[0].doubleValue! + arguments[1].doubleValue!
+                
+                return .success(JSObject(double: result, in: context))
+            }
+            
+            XCTAssertTrue(myFunction.isFunction)
+            
+            let result = try myFunction.call(withArguments: [JSObject(double: 1, in: context), JSObject(double: 2, in: context)])
+            
+            XCTAssertTrue(result.isNumber)
+            XCTAssertEqual(result.doubleValue, 3)
+            
+        } catch let error {
+            
+            XCTFail("\((error as? JSObject)?.value(forProperty: "message") ?? error)")
+        }
+    }
+    
+    func testFunction2() {
+        
+        let context = JSContext()
+        
+        do {
+            
+            let myFunction = JSObject(function: "myFunction", in: context) { context, this, arguments in
+                
+                let result = arguments[0].doubleValue! + arguments[1].doubleValue!
+                
+                return .success(JSObject(double: result, in: context))
+            }
+            
+            XCTAssertTrue(myFunction.isFunction)
+            
+            let result = try context.evaluateScript("myFunction(1, 2)")
+            
+            XCTAssertTrue(result.isNumber)
+            XCTAssertEqual(result.doubleValue, 3)
+            
+        } catch let error {
+            
+            XCTFail("\((error as? JSObject)?.value(forProperty: "message") ?? error)")
+        }
+    }
+    
+    func testClass() {
+        
+        let context = JSContext()
+        
+        do {
+            
+            let myFunction = JSObject(function: "myClass", in: context) { context, this, arguments in
+                
+                let result = arguments[0].doubleValue! + arguments[1].doubleValue!
+                
+                let object = JSObject(newObjectIn: context)
+                object.setValue(JSObject(double: result, in: context), forProperty: "result")
+                
+                return .success(object)
+            }
+            
+            XCTAssertTrue(myFunction.isFunction)
+            
+            let result = try context.evaluateScript("new myClass(1, 2)")
+            
+            XCTAssertTrue(result.isObject)
+            XCTAssertEqual(result.value(forProperty: "result").doubleValue, 3)
+            
+        } catch let error {
+            
+            XCTFail("\((error as? JSObject)?.value(forProperty: "message") ?? error)")
         }
     }
     
