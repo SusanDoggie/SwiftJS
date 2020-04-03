@@ -56,7 +56,7 @@ public class JSContext {
 
 extension JSContext {
     
-    public var globalObject: JSObject {
+    public var global: JSObject {
         return JSObject(context: self, object: JSContextGetGlobalObject(context))
     }
 }

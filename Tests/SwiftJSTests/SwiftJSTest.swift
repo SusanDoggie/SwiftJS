@@ -41,7 +41,7 @@ class SwiftJSTest: XCTestCase {
             
         } catch let error {
             
-            XCTFail("\((error as? JSObject)?.value(forProperty: "message") ?? error)")
+            XCTFail("\((error as? JSObject)?["message"] ?? error)")
         }
     }
     
@@ -55,16 +55,16 @@ class SwiftJSTest: XCTestCase {
             
             XCTAssertTrue(result.isArray)
             
-            let length = result.value(forProperty: "length")
+            let length = result["length"]
             XCTAssertEqual(length.doubleValue, 3)
             
-            XCTAssertEqual(result.value(at: 0).doubleValue, 3)
-            XCTAssertEqual(result.value(at: 1).stringValue, "BMW")
-            XCTAssertEqual(result.value(at: 2).stringValue, "Volvo")
+            XCTAssertEqual(result[0].doubleValue, 3)
+            XCTAssertEqual(result[1].stringValue, "BMW")
+            XCTAssertEqual(result[2].stringValue, "Volvo")
             
         } catch let error {
             
-            XCTFail("\((error as? JSObject)?.value(forProperty: "message") ?? error)")
+            XCTFail("\((error as? JSObject)?["message"] ?? error)")
         }
     }
     
@@ -83,7 +83,7 @@ class SwiftJSTest: XCTestCase {
             
             XCTAssertTrue(myFunction.isFunction)
             
-            context.globalObject.setValue(myFunction, forProperty: "myFunction")
+            context.global["myFunction"] = myFunction
             
             let result = try myFunction.call(withArguments: [JSObject(double: 1, in: context), JSObject(double: 2, in: context)])
             
@@ -92,7 +92,7 @@ class SwiftJSTest: XCTestCase {
             
         } catch let error {
             
-            XCTFail("\((error as? JSObject)?.value(forProperty: "message") ?? error)")
+            XCTFail("\((error as? JSObject)?["message"] ?? error)")
         }
     }
     
@@ -111,7 +111,7 @@ class SwiftJSTest: XCTestCase {
             
             XCTAssertTrue(myFunction.isFunction)
             
-            context.globalObject.setValue(myFunction, forProperty: "myFunction")
+            context.global["myFunction"] = myFunction
             
             let result = try context.evaluateScript("myFunction(1, 2)")
             
@@ -120,7 +120,7 @@ class SwiftJSTest: XCTestCase {
             
         } catch let error {
             
-            XCTFail("\((error as? JSObject)?.value(forProperty: "message") ?? error)")
+            XCTFail("\((error as? JSObject)?["message"] ?? error)")
         }
     }
     
@@ -135,25 +135,25 @@ class SwiftJSTest: XCTestCase {
                 let result = arguments[0].doubleValue! + arguments[1].doubleValue!
                 
                 let object = JSObject(newObjectIn: context)
-                object.setValue(JSObject(double: result, in: context), forProperty: "result")
+                object["result"] = JSObject(double: result, in: context)
                 
                 return .success(object)
             }
             
             XCTAssertTrue(myClass.isConstructor)
             
-            context.globalObject.setValue(myClass, forProperty: "myClass")
+            context.global["myClass"] = myClass
             
             let result = try context.evaluateScript("new myClass(1, 2)")
             
             XCTAssertTrue(result.isObject)
-            XCTAssertEqual(result.value(forProperty: "result").doubleValue, 3)
+            XCTAssertEqual(result["result"].doubleValue, 3)
             
             XCTAssertTrue(result.isInstance(of: myClass))
             
         } catch let error {
             
-            XCTFail("\((error as? JSObject)?.value(forProperty: "message") ?? error)")
+            XCTFail("\((error as? JSObject)?["message"] ?? error)")
         }
     }
     

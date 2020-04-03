@@ -254,7 +254,7 @@ extension JSObject {
     
     public var isArray: Bool {
         guard self.isObject else { return false }
-        let arrayClass = context.globalObject.value(forProperty: "Array")
+        let arrayClass = context.global["Array"]
         guard let result = try? arrayClass.invokeMethod("isArray", withArguments: [self]) else { return false }
         return JSValueToBoolean(context.context, result.object)
     }
@@ -287,6 +287,14 @@ extension JSObject {
         return str.map(String.init)
     }
     
+    public var array: [JSObject]? {
+        guard self.isArray else { return nil }
+        return (0..<self.count).map { self[$0] }
+    }
+    
+    public var dictionary: [String: JSObject] {
+        return self.properties.reduce(into: [:]) { $0[$1] = self[$1] }
+    }
 }
 
 extension JSObject {
@@ -315,7 +323,7 @@ extension JSObject {
     
     public func invokeMethod(_ name: String, withArguments arguments: [JSObject]) throws -> JSObject {
         
-        let method = self.value(forProperty: name)
+        let method = self[name]
         
         var exception: JSObjectRef?
         
@@ -354,7 +362,7 @@ extension JSObject {
 extension JSObject {
     
     /// Get the names of an object’s enumerable properties.
-    public var propertyNames: [String] {
+    public var properties: [String] {
         
         let _list = JSObjectCopyPropertyNames(context.context, object)
         defer { JSPropertyNameArrayRelease(_list) }
@@ -378,45 +386,41 @@ extension JSObject {
     /// Deletes a property from an object.
     /// - Parameter property: A the property's name.
     /// - Returns: true if the delete operation succeeds, otherwise false.
-    @discardableResult public func deleteProperty(_ property: String) -> Bool {
+    @discardableResult public func removeProperty(_ property: String) -> Bool {
         let property = property.withCString(JSStringCreateWithUTF8CString)
         defer { JSStringRelease(property) }
         return JSObjectDeleteProperty(context.context, object, property, nil)
     }
     
-    /// Get the property value.
-    /// - Parameter property: A the property's name.
-    /// - Returns: The property's value if object has the property, otherwise the undefined value.
-    public func value(forProperty property: String) -> JSObject {
-        let property = JSStringCreateWithUTF8CString(property)
-        defer { JSStringRelease(property) }
-        let result = JSObjectGetProperty(context.context, object, property, nil)
-        return JSObject(context: context, object: result!)
+    public subscript(property: String) -> JSObject {
+        get {
+            let property = JSStringCreateWithUTF8CString(property)
+            defer { JSStringRelease(property) }
+            let result = JSObjectGetProperty(context.context, object, property, nil)
+            return JSObject(context: context, object: result!)
+        }
+        set {
+            let property = JSStringCreateWithUTF8CString(property)
+            defer { JSStringRelease(property) }
+            JSObjectSetProperty(context.context, object, property, newValue.object, 0, nil)
+        }
+    }
+}
+
+extension JSObject {
+    
+    public var count: Int {
+        guard self.isArray else { return 0 }
+        return Int(self["length"].doubleValue ?? 0)
     }
     
-    /// Set a property value.
-    /// - Parameters:
-    ///   - value: Value for the property.
-    ///   - property: A the property's name.
-    public func setValue(_ value: JSObject, forProperty property: String) {
-        let property = JSStringCreateWithUTF8CString(property)
-        defer { JSStringRelease(property) }
-        JSObjectSetProperty(context.context, object, property, value.object, 0, nil)
-    }
-    
-    /// Get the value at index
-    /// - Parameter index: The index value.
-    /// - Returns: The value if object exists, otherwise the undefined value.
-    public func value(at index: Int) -> JSObject {
-        let result = JSObjectGetPropertyAtIndex(context.context, object, UInt32(index), nil)
-        return JSObject(context: context, object: result!)
-    }
-    
-    /// Set a value at index.
-    /// - Parameters:
-    ///   - value: The value to set.
-    ///   - index: The index value.
-    public func setValue(_ value: JSObject, at index: Int) {
-        JSObjectSetPropertyAtIndex(context.context, object, UInt32(index), value.object, nil)
+    public subscript(index: Int) -> JSObject {
+        get {
+            let result = JSObjectGetPropertyAtIndex(context.context, object, UInt32(index), nil)
+            return JSObject(context: context, object: result!)
+        }
+        set {
+            JSObjectSetPropertyAtIndex(context.context, object, UInt32(index), newValue.object, nil)
+        }
     }
 }
