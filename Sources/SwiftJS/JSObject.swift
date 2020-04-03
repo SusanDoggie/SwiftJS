@@ -189,27 +189,8 @@ extension JSObject: CustomStringConvertible {
         if self.isNumber { return "\(self.doubleValue!)" }
         if self.isString { return "\"\(self.stringValue!.unicodeScalars.reduce(into: "") { $0 += $1.escaped(asASCII: false) })\"" }
         
-        if self.isArray {
-            let count = Int(self.value(forProperty: "length").doubleValue ?? 0)
-            return "\((0..<count).map(self.value))"
-        }
-        
-        if self.isFunction {
-            return "function"
-        }
-        
-        if self.isObject {
-            
-            var object: [String: JSObject] = [:]
-            
-            for property in self.propertyNames {
-                object[property] = self.value(forProperty: property)
-            }
-            
-            return "\(object)"
-        }
-        
-        return "object"
+        let description = try? self.invokeMethod("toString", withArguments: [])
+        return description?.stringValue ?? "unknown"
     }
 }
 
