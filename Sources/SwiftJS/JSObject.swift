@@ -178,6 +178,19 @@ extension JSObject: Error {
 
 extension JSObject {
     
+    public var prototype: JSObject {
+        get {
+            let prototype = JSObjectGetPrototype(context.context, object)
+            return JSObject(context: context, object: prototype!)
+        }
+        set {
+            JSObjectSetPrototype(context.context, object, newValue.object)
+        }
+    }
+}
+
+extension JSObject {
+    
     public var isUndefined: Bool {
         return JSValueIsUndefined(context.context, object)
     }
