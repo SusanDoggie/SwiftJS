@@ -83,8 +83,6 @@ class SwiftJSTest: XCTestCase {
             
             XCTAssertTrue(myFunction.isFunction)
             
-            context.global["myFunction"] = myFunction
-            
             let result = try myFunction.call(withArguments: [JSObject(double: 1, in: context), JSObject(double: 2, in: context)])
             
             XCTAssertTrue(result.isNumber)
