@@ -37,7 +37,7 @@ public class JSContext {
     
     public let virtualMachine: JSVirtualMachine
     
-    let context: JSContextRef
+    let context: JSGlobalContextRef
     
     public convenience init() {
         self.init(virtualMachine: JSVirtualMachine())
