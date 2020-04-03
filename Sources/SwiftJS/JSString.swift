@@ -1,5 +1,5 @@
 //
-//  SwiftJSTest.swift
+//  JSString.swift
 //
 //  The MIT License
 //  Copyright (c) 2015 - 2020 Susan Cheng. All rights reserved.
@@ -23,51 +23,22 @@
 //  THE SOFTWARE.
 //
 
-import SwiftJS
-import XCTest
+#if canImport(JavaScriptCore)
 
-class SwiftJSTest: XCTestCase {
+import JavaScriptCore
+
+#else
+
+import CJSCore
+
+#endif
+
+extension String {
     
-    func testCalculation() {
-        
-        let context = JSContext()
-        
-        do {
-            
-            let result = try context.evaluateScript("1 + 1")
-            
-            XCTAssertTrue(result.isNumber)
-            XCTAssertEqual(result.doubleValue, 2)
-            
-        } catch let error {
-            
-            print(error)
-            XCTFail()
-        }
+    init(_ str: JSStringRef) {
+        let bytes = JSStringGetMaximumUTF8CStringSize(str)
+        var buffer = [Int8](repeating: 0, count: bytes)
+        JSStringGetUTF8CString(str, &buffer, bytes)
+        self.init(cString: buffer)
     }
-    
-    func testArray() {
-        
-        let context = JSContext()
-        
-        do {
-            
-            let result = try context.evaluateScript("[1 + 2, \"BMW\", \"Volvo\"]")
-            
-            XCTAssertTrue(result.isArray)
-            
-            let length = result.value(forProperty: "length")
-            XCTAssertEqual(length.doubleValue, 3)
-            
-            XCTAssertEqual(result.value(at: 0).doubleValue, 3)
-            XCTAssertEqual(result.value(at: 1).stringValue, "BMW")
-            XCTAssertEqual(result.value(at: 2).stringValue, "Volvo")
-            
-        } catch let error {
-            
-            print(error)
-            XCTFail()
-        }
-    }
-    
 }

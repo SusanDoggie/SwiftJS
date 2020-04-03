@@ -51,4 +51,54 @@ public class JSContext {
     deinit {
         JSGlobalContextRelease(context)
     }
+    
+}
+
+extension JSContext {
+    
+    public var globalObject: JSObject {
+        return JSObject(context: self, object: JSContextGetGlobalObject(context))
+    }
+}
+
+extension JSContext {
+    
+    public func checkScriptSyntax(_ script: String, sourceURL: URL? = nil, startingLineNumber: Int = 0) throws -> Bool {
+        
+        let script = script.withCString(JSStringCreateWithUTF8CString)
+        defer { JSStringRelease(script) }
+        
+        let sourceURL = sourceURL?.path.withCString(JSStringCreateWithUTF8CString)
+        defer { sourceURL.map(JSStringRelease) }
+        
+        var exception: JSObjectRef?
+        
+        let result = JSCheckScriptSyntax(context, script, sourceURL, Int32(startingLineNumber), &exception)
+        
+        if let exception = exception { throw JSObject(context: self, object: exception) }
+        
+        return result
+    }
+    
+    public func evaluateScript(_ script: String, thisObject: JSObjectRef? = nil, sourceURL: URL? = nil, startingLineNumber: Int = 0) throws -> JSObject {
+        
+        let script = script.withCString(JSStringCreateWithUTF8CString)
+        defer { JSStringRelease(script) }
+        
+        let sourceURL = sourceURL?.path.withCString(JSStringCreateWithUTF8CString)
+        defer { sourceURL.map(JSStringRelease) }
+        
+        var exception: JSObjectRef?
+        
+        let result = JSEvaluateScript(context, script, thisObject, sourceURL, Int32(startingLineNumber), &exception)
+        
+        if let exception = exception { throw JSObject(context: self, object: exception) }
+        
+        return JSObject(context: self, object: result!)
+    }
+    
+    public func garbageCollect() {
+        JSGarbageCollect(context)
+    }
+    
 }
