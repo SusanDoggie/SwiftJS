@@ -68,7 +68,7 @@ extension JSContext {
         let script = script.withCString(JSStringCreateWithUTF8CString)
         defer { JSStringRelease(script) }
         
-        let sourceURL = sourceURL?.path.withCString(JSStringCreateWithUTF8CString)
+        let sourceURL = sourceURL?.absoluteString.withCString(JSStringCreateWithUTF8CString)
         defer { sourceURL.map(JSStringRelease) }
         
         var exception: JSObjectRef?
@@ -85,7 +85,7 @@ extension JSContext {
         let script = script.withCString(JSStringCreateWithUTF8CString)
         defer { JSStringRelease(script) }
         
-        let sourceURL = sourceURL?.path.withCString(JSStringCreateWithUTF8CString)
+        let sourceURL = sourceURL?.absoluteString.withCString(JSStringCreateWithUTF8CString)
         defer { sourceURL.map(JSStringRelease) }
         
         var exception: JSObjectRef?
