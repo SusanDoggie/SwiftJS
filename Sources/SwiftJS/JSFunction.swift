@@ -63,6 +63,9 @@ private func function_constructor(_ ctx: JSContextRef?,
         let arguments = (0..<argumentCount).map { JSObject(context: context, object: arguments![$0]!) }
         let result = try info.pointee.callback(context, nil, arguments)
         
+        let prototype = JSObjectGetPrototype(context.context, object)
+        JSObjectSetPrototype(context.context, result.object, prototype)
+        
         return result.object
         
     } catch let error {

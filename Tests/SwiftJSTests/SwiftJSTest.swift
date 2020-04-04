@@ -78,7 +78,7 @@ class SwiftJSTest: XCTestCase {
                 
                 let result = arguments[0].doubleValue! + arguments[1].doubleValue!
                 
-                return .success(JSObject(double: result, in: context))
+                return JSObject(double: result, in: context)
             }
             
             XCTAssertTrue(myFunction.isFunction)
@@ -104,7 +104,7 @@ class SwiftJSTest: XCTestCase {
                 
                 let result = arguments[0].doubleValue! + arguments[1].doubleValue!
                 
-                return .success(JSObject(double: result, in: context))
+                return JSObject(double: result, in: context)
             }
             
             XCTAssertTrue(myFunction.isFunction)
@@ -135,7 +135,7 @@ class SwiftJSTest: XCTestCase {
                 let object = JSObject(newObjectIn: context)
                 object["result"] = JSObject(double: result, in: context)
                 
-                return .success(object)
+                return object
             }
             
             XCTAssertTrue(myClass.isConstructor)
