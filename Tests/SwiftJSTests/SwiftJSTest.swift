@@ -155,4 +155,65 @@ class SwiftJSTest: XCTestCase {
         }
     }
     
+    func testGetter() {
+        
+        let context = JSContext()
+        
+        do {
+            
+            context.global["obj"] = JSObject(newObjectIn: context)
+            
+            let desc = JSPropertyDescriptor(getter: JSObject(newFunctionIn: context) { context, _, _ in
+                return JSObject(double: 3, in: context)
+            })
+            
+            context.global["obj"].defineProperty("three", desc)
+            
+            let result = try context.evaluateScript("obj.three")
+            
+            XCTAssertEqual(result.doubleValue, 3)
+            
+        } catch let error {
+            
+            XCTFail("\((error as? JSObject)?["message"] ?? error)")
+        }
+    }
+    
+    func testSetter() {
+        
+        let context = JSContext()
+        
+        do {
+            
+            context.global["obj"] = JSObject(newObjectIn: context)
+            
+            let desc = JSPropertyDescriptor(getter: JSObject(newFunctionIn: context) { context, this, _ in
+                
+                return this?["number_container"] ?? JSObject(undefinedIn: context)
+                
+                }, setter: JSObject(newFunctionIn: context) { context, this, arguments in
+                    
+                    this?["number_container"] = arguments[0]
+                    
+                    return JSObject(undefinedIn: context)
+            })
+            
+            context.global["obj"].defineProperty("number", desc)
+            
+            try context.evaluateScript("obj.number = 5")
+            
+            XCTAssertEqual(context.global["obj"]["number"].doubleValue, 5)
+            XCTAssertEqual(context.global["obj"]["number_container"].doubleValue, 5)
+            
+            try context.evaluateScript("obj.number = 3")
+            
+            XCTAssertEqual(context.global["obj"]["number"].doubleValue, 3)
+            XCTAssertEqual(context.global["obj"]["number_container"].doubleValue, 3)
+            
+        } catch let error {
+            
+            XCTFail("\((error as? JSObject)?["message"] ?? error)")
+        }
+    }
+    
 }

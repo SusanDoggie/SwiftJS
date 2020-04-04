@@ -205,6 +205,7 @@ extension JSObject {
 
 extension JSObject {
     
+    @discardableResult
     public func call(withArguments arguments: [JSObject]) throws -> JSObject {
         
         var exception: JSObjectRef?
@@ -227,6 +228,7 @@ extension JSObject {
         return JSObject(context: context, object: result!)
     }
     
+    @discardableResult
     public func invokeMethod(_ name: String, withArguments arguments: [JSObject]) throws -> JSObject {
         
         let method = self[name]

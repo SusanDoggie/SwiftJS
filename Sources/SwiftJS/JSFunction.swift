@@ -49,11 +49,13 @@ private func function_finalize(_ object: JSObjectRef?) -> Void {
     info.deinitialize(count: 1)
     info.deallocate()
 }
-private func function_constructor(_ ctx: JSContextRef?,
-                                  _ object: JSObjectRef?,
-                                  _ argumentCount: Int,
-                                  _ arguments: UnsafePointer<JSValueRef?>?,
-                                  _ exception: UnsafeMutablePointer<JSValueRef?>?) -> JSObjectRef? {
+private func function_constructor(
+    _ ctx: JSContextRef?,
+    _ object: JSObjectRef?,
+    _ argumentCount: Int,
+    _ arguments: UnsafePointer<JSValueRef?>?,
+    _ exception: UnsafeMutablePointer<JSValueRef?>?
+) -> JSObjectRef? {
     
     let info = JSObjectGetPrivate(object).assumingMemoryBound(to: JSObjectCallbackInfo.self)
     let context = info.pointee.context
@@ -76,12 +78,14 @@ private func function_constructor(_ ctx: JSContextRef?,
         return nil
     }
 }
-private func function_callback(_ ctx: JSContextRef?,
-                               _ object: JSObjectRef?,
-                               _ thisObject: JSObjectRef?,
-                               _ argumentCount: Int,
-                               _ arguments: UnsafePointer<JSValueRef?>?,
-                               _ exception: UnsafeMutablePointer<JSValueRef?>?) -> JSValueRef? {
+private func function_callback(
+    _ ctx: JSContextRef?,
+    _ object: JSObjectRef?,
+    _ thisObject: JSObjectRef?,
+    _ argumentCount: Int,
+    _ arguments: UnsafePointer<JSValueRef?>?,
+    _ exception: UnsafeMutablePointer<JSValueRef?>?
+) -> JSValueRef? {
     
     let info = JSObjectGetPrivate(object).assumingMemoryBound(to: JSObjectCallbackInfo.self)
     let context = info.pointee.context
@@ -103,10 +107,12 @@ private func function_callback(_ ctx: JSContextRef?,
     }
 }
 
-private func function_instanceof(_ ctx: JSContextRef?,
-                                 _ constructor: JSObjectRef?,
-                                 _ possibleInstance: JSValueRef?,
-                                 _ exception: UnsafeMutablePointer<JSValueRef?>?) -> Bool {
+private func function_instanceof(
+    _ ctx: JSContextRef?,
+    _ constructor: JSObjectRef?,
+    _ possibleInstance: JSValueRef?,
+    _ exception: UnsafeMutablePointer<JSValueRef?>?
+) -> Bool {
     
     let info = JSObjectGetPrivate(constructor).assumingMemoryBound(to: JSObjectCallbackInfo.self)
     
