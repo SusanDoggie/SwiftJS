@@ -283,7 +283,7 @@ extension JSObject {
     }
     
     /// Tests whether an object has a given property.
-    /// - Parameter property: A the property's name.
+    /// - Parameter property: The property's name.
     /// - Returns: true if the object has `property`, otherwise false.
     public func hasProperty(_ property: String) -> Bool {
         let property = property.withCString(JSStringCreateWithUTF8CString)
@@ -292,7 +292,7 @@ extension JSObject {
     }
     
     /// Deletes a property from an object.
-    /// - Parameter property: A the property's name.
+    /// - Parameter property: The property's name.
     /// - Returns: true if the delete operation succeeds, otherwise false.
     @discardableResult
     public func removeProperty(_ property: String) -> Bool {
