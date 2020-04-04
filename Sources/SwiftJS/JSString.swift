@@ -36,9 +36,6 @@ import CJSCore
 extension String {
     
     init(_ str: JSStringRef) {
-        let bytes = JSStringGetMaximumUTF8CStringSize(str)
-        var buffer = [Int8](repeating: 0, count: bytes)
-        JSStringGetUTF8CString(str, &buffer, bytes)
-        self.init(cString: buffer)
+        self.init(utf16CodeUnits: JSStringGetCharactersPtr(str), count: JSStringGetLength(str))
     }
 }
