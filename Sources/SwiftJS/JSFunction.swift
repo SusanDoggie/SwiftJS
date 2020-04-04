@@ -33,7 +33,7 @@ import CJSCore
 
 #endif
 
-public typealias JSObjectCallAsFunctionCallback = (JSContext, JSObject?, [JSObject]) -> Result<JSObject, JSObject>
+public typealias JSObjectCallAsFunctionCallback = (JSContext, JSObject?, [JSObject]) throws -> JSObject
 
 private struct JSObjectCallbackInfo {
     
@@ -56,24 +56,20 @@ private func function_constructor(_ ctx: JSContextRef?,
                                   _ exception: UnsafeMutablePointer<JSValueRef?>?) -> JSObjectRef? {
     
     let info = JSObjectGetPrivate(object).assumingMemoryBound(to: JSObjectCallbackInfo.self)
-    
     let context = info.pointee.context
     
-    let arguments = (0..<argumentCount).map { JSObject(context: context, object: arguments![$0]!) }
-    
-    let result = info.pointee.callback(context, nil, arguments)
-    
-    switch result {
-    case let .success(value):
+    do {
         
-        let prototype = JSObjectGetPrototype(context.context, object)
-        JSObjectSetPrototype(context.context, value.object, prototype)
+        let arguments = (0..<argumentCount).map { JSObject(context: context, object: arguments![$0]!) }
+        let result = try info.pointee.callback(context, nil, arguments)
         
-        return value.object
+        return result.object
         
-    case let .failure(error):
+    } catch let error {
         
+        let error = error as? JSObject ?? JSObject(newErrorFromMessage: "\(error)", in: context)
         exception?.pointee = error.object
+        
         return nil
     }
 }
@@ -85,22 +81,21 @@ private func function_callback(_ ctx: JSContextRef?,
                                _ exception: UnsafeMutablePointer<JSValueRef?>?) -> JSValueRef? {
     
     let info = JSObjectGetPrivate(object).assumingMemoryBound(to: JSObjectCallbackInfo.self)
-    
     let context = info.pointee.context
     
-    let thisObject = thisObject.map { JSObject(context: context, object: $0) }
-    let arguments = (0..<argumentCount).map { JSObject(context: context, object: arguments![$0]!) }
-    
-    let result = info.pointee.callback(context, thisObject, arguments)
-    
-    switch result {
-    case let .success(value):
+    do {
         
-        return value.object
+        let thisObject = thisObject.map { JSObject(context: context, object: $0) }
+        let arguments = (0..<argumentCount).map { JSObject(context: context, object: arguments![$0]!) }
+        let result = try info.pointee.callback(context, thisObject, arguments)
         
-    case let .failure(error):
+        return result.object
         
+    } catch let error {
+        
+        let error = error as? JSObject ?? JSObject(newErrorFromMessage: "\(error)", in: context)
         exception?.pointee = error.object
+        
         return nil
     }
 }
