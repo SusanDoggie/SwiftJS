@@ -63,6 +63,31 @@ extension JSContext {
 
 extension JSContext {
     
+    public var properties: [String] {
+        return global.properties
+    }
+    
+    public func hasProperty(_ property: String) -> Bool {
+        return global.hasProperty(property)
+    }
+    
+    @discardableResult
+    public func removeProperty(_ property: String) -> Bool {
+        return global.removeProperty(property)
+    }
+    
+    public subscript(property: String) -> JSObject {
+        get {
+            return global[property]
+        }
+        set {
+            global[property] = newValue
+        }
+    }
+}
+
+extension JSContext {
+    
     public func checkScriptSyntax(_ script: String, sourceURL: URL? = nil, startingLineNumber: Int = 0) throws -> Bool {
         
         let script = script.withCString(JSStringCreateWithUTF8CString)

@@ -161,8 +161,7 @@ extension JSObject {
     
     public var isArray: Bool {
         guard self.isObject else { return false }
-        let arrayClass = context.global["Array"]
-        guard let result = try? arrayClass.invokeMethod("isArray", withArguments: [self]) else { return false }
+        guard let result = try? context.global["Array"].invokeMethod("isArray", withArguments: [self]) else { return false }
         return JSValueToBoolean(context.context, result.object)
     }
     
@@ -293,7 +292,8 @@ extension JSObject {
     /// Deletes a property from an object.
     /// - Parameter property: A the property's name.
     /// - Returns: true if the delete operation succeeds, otherwise false.
-    @discardableResult public func removeProperty(_ property: String) -> Bool {
+    @discardableResult
+    public func removeProperty(_ property: String) -> Bool {
         let property = property.withCString(JSStringCreateWithUTF8CString)
         defer { JSStringRelease(property) }
         return JSObjectDeleteProperty(context.context, object, property, nil)
