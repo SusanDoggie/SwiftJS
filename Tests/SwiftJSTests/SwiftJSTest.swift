@@ -163,9 +163,9 @@ class SwiftJSTest: XCTestCase {
             
             context.global["obj"] = JSObject(newObjectIn: context)
             
-            let desc = JSPropertyDescriptor(getter: JSObject(newFunctionIn: context) { context, _, _ in
-                return JSObject(double: 3, in: context)
-            })
+            let desc = JSPropertyDescriptor(
+                getter: { this in JSObject(double: 3, in: this.context) }
+            )
             
             context.global["obj"].defineProperty("three", desc)
             
@@ -187,16 +187,10 @@ class SwiftJSTest: XCTestCase {
             
             context.global["obj"] = JSObject(newObjectIn: context)
             
-            let desc = JSPropertyDescriptor(getter: JSObject(newFunctionIn: context) { context, this, _ in
-                
-                return this?["number_container"] ?? JSObject(undefinedIn: context)
-                
-                }, setter: JSObject(newFunctionIn: context) { context, this, arguments in
-                    
-                    this?["number_container"] = arguments[0]
-                    
-                    return JSObject(undefinedIn: context)
-            })
+            let desc = JSPropertyDescriptor(
+                getter: { this in this["number_container"] },
+                setter: { this, newValue in this["number_container"] = newValue }
+            )
             
             context.global["obj"].defineProperty("number", desc)
             

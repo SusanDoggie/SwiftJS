@@ -39,9 +39,9 @@ public struct JSPropertyDescriptor {
     
     public let writable: Bool?
     
-    public let getter: JSObject?
+    public let getter: ((JSObject) -> JSObject)?
     
-    public let setter: JSObject?
+    public let setter: ((JSObject, JSObject) -> Void)?
     
     public let configurable: Bool?
     
@@ -50,14 +50,12 @@ public struct JSPropertyDescriptor {
     public init(
         value: JSObject? = nil,
         writable: Bool? = nil,
-        getter: JSObject? = nil,
-        setter: JSObject? = nil,
+        getter: ((JSObject) -> JSObject)? = nil,
+        setter: ((JSObject, JSObject) -> Void)? = nil,
         configurable: Bool? = nil,
         enumerable: Bool? = nil
     ) {
         precondition((value == nil && writable == nil) || (getter == nil && setter == nil), "Invalid descriptor type")
-        precondition(getter?.isFunction != false, "Invalid object")
-        precondition(setter?.isFunction != false, "Invalid object")
         self.value = value
         self.writable = writable
         self.getter = getter
@@ -72,10 +70,18 @@ extension JSObject {
     public func defineProperty(_ property: String, _ descriptor: JSPropertyDescriptor) {
         
         let desc = JSObject(newObjectIn: context)
+        
         if let value = descriptor.value { desc["value"] = value }
         if let writable = descriptor.writable { desc["writable"] = JSObject(bool: writable, in: context) }
-        if let getter = descriptor.getter { desc["get"] = getter }
-        if let setter = descriptor.setter { desc["set"] = setter }
+        if let getter = descriptor.getter {
+            desc["get"] = JSObject(newFunctionIn: context) { _, this, _ in getter(this!) }
+        }
+        if let setter = descriptor.setter {
+            desc["set"] = JSObject(newFunctionIn: context) { context, this, arguments in
+                setter(this!, arguments[0])
+                return JSObject(undefinedIn: context)
+            }
+        }
         if let configurable = descriptor.configurable { desc["configurable"] = JSObject(bool: configurable, in: context) }
         if let enumerable = descriptor.enumerable { desc["enumerable"] = JSObject(bool: enumerable, in: context) }
         
