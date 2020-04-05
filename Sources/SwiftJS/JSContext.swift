@@ -41,6 +41,8 @@ public class JSContext {
     
     public private(set) var exception: JSObject?
     
+    public var exceptionHandler: ((JSContext, JSObject) -> Void)?
+    
     public convenience init() {
         self.init(virtualMachine: JSVirtualMachine())
     }
@@ -64,7 +66,14 @@ extension JSContext {
             return nil
         }
         set {
-            exception = newValue.map { JSObject(context: self, object: $0) }
+            
+            guard let newValue = newValue else { return }
+            
+            if let callback = exceptionHandler {
+                callback(self, JSObject(context: self, object: newValue))
+            } else {
+                exception = JSObject(context: self, object: newValue)
+            }
         }
     }
 }

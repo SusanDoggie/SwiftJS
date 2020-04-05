@@ -80,7 +80,8 @@ extension JSObject {
         self.init(context: context, object: object!)
     }
     
-    public convenience init(newErrorFromMessage message: String, in context: JSContext) {let arguments = [JSObject(string: message, in: context)]
+    public convenience init(newErrorFromMessage message: String, in context: JSContext) {
+        let arguments = [JSObject(string: message, in: context)]
         self.init(context: context, object: JSObjectMakeError(context.context, 1, arguments.map { $0.object }, &context._exception))
     }
     
@@ -298,7 +299,8 @@ extension JSObject {
     /// - Parameter property: The property's name.
     /// - Returns: true if the delete operation succeeds, otherwise false.
     @discardableResult
-    public func removeProperty(_ property: String) -> Bool {let property = property.withCString(JSStringCreateWithUTF8CString)
+    public func removeProperty(_ property: String) -> Bool {
+        let property = property.withCString(JSStringCreateWithUTF8CString)
         defer { JSStringRelease(property) }
         return JSObjectDeleteProperty(context.context, object, property, &context._exception)
     }
