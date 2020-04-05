@@ -39,6 +39,10 @@ public struct JSPropertyDescriptor {
     
     public let writable: Bool?
     
+    let _getter: JSObject?
+    
+    let _setter: JSObject?
+    
     public let getter: ((JSObject) -> JSObject)?
     
     public let setter: ((JSObject, JSObject) -> Void)?
@@ -58,8 +62,35 @@ public struct JSPropertyDescriptor {
         precondition((value == nil && writable == nil) || (getter == nil && setter == nil), "Invalid descriptor type")
         self.value = value
         self.writable = writable
+        self._getter = nil
+        self._setter = nil
         self.getter = getter
         self.setter = setter
+        self.configurable = configurable
+        self.enumerable = enumerable
+    }
+    
+    public init(
+        getter: JSObject? = nil,
+        setter: JSObject? = nil,
+        configurable: Bool? = nil,
+        enumerable: Bool? = nil
+    ) {
+        precondition(getter?.isFunction != false, "Invalid getter type")
+        precondition(setter?.isFunction != false, "Invalid setter type")
+        self.value = nil
+        self.writable = nil
+        self._getter = getter
+        self._setter = setter
+        self.getter = getter.map { getter in { this in
+            let context = this.context
+            let result = JSObjectCallAsFunction(context.context, getter.object, this.object, 0, nil, &context._exception)
+            return result.map { JSObject(context: context, object: $0) } ?? JSObject(undefinedIn: context)
+            } }
+        self.setter = setter.map { setter in { this, newValue in
+            let context = this.context
+            JSObjectCallAsFunction(context.context, setter.object, this.object, 1, [newValue.object], &context._exception)
+            } }
         self.configurable = configurable
         self.enumerable = enumerable
     }
@@ -100,10 +131,14 @@ extension JSObject {
         
         if let value = descriptor.value { desc["value"] = value }
         if let writable = descriptor.writable { desc["writable"] = JSObject(bool: writable, in: context) }
-        if let getter = descriptor.getter {
+        if let getter = descriptor._getter {
+            desc["get"] = getter
+        } else if let getter = descriptor.getter {
             desc["get"] = JSObject(newFunctionIn: context) { _, this, _ in getter(this!) }
         }
-        if let setter = descriptor.setter {
+        if let setter = descriptor._setter {
+            desc["set"] = setter
+        } else if let setter = descriptor.setter {
             desc["set"] = JSObject(newFunctionIn: context) { context, this, arguments in
                 setter(this!, arguments[0])
                 return JSObject(undefinedIn: context)
