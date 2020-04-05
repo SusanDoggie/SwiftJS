@@ -232,6 +232,11 @@ extension JSObject {
         return JSValueIsObject(context.context, object)
     }
     
+    /// Tests whether a JavaScript value’s type is the date type.
+    public var isDate: Bool {
+        return self.isInstance(of: context.global["Date"])
+    }
+    
     /// Tests whether a JavaScript value’s type is the array type.
     public var isArray: Bool {
         let result = context.global["Array"].invokeMethod("isArray", withArguments: [self])
