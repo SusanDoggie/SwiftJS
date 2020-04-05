@@ -65,7 +65,7 @@ extension JSObject {
 
 extension JSObject {
     
-    /// Creates a JavaScript value of the undefined type.
+    /// Creates a JavaScript value of the `undefined` type.
     /// 
     /// - Parameters:
     ///   - context: The execution context to use.
@@ -73,7 +73,7 @@ extension JSObject {
         self.init(context: context, object: JSValueMakeUndefined(context.context))
     }
     
-    /// Creates a JavaScript value of the null type.
+    /// Creates a JavaScript value of the `null` type.
     ///
     /// - Parameters:
     ///   - context: The execution context to use.
@@ -81,7 +81,7 @@ extension JSObject {
         self.init(context: context, object: JSValueMakeNull(context.context))
     }
     
-    /// Creates a JavaScript Boolean value.
+    /// Creates a JavaScript `Boolean` value.
     ///
     /// - Parameters:
     ///   - value: The value to assign to the object.
@@ -90,7 +90,7 @@ extension JSObject {
         self.init(context: context, object: JSValueMakeBoolean(context.context, value))
     }
     
-    /// Creates a JavaScript value of the number type.
+    /// Creates a JavaScript value of the `Number` type.
     ///
     /// - Parameters:
     ///   - value: The value to assign to the object.
@@ -99,7 +99,7 @@ extension JSObject {
         self.init(context: context, object: JSValueMakeNumber(context.context, value))
     }
     
-    /// Creates a JavaScript value of the string type.
+    /// Creates a JavaScript value of the `String` type.
     ///
     /// - Parameters:
     ///   - value: The value to assign to the object.
@@ -110,7 +110,7 @@ extension JSObject {
         self.init(context: context, object: JSValueMakeString(context.context, value))
     }
     
-    /// Creates a JavaScript value of the date type.
+    /// Creates a JavaScript `Date` object, as if by invoking the built-in `RegExp` constructor.
     ///
     /// - Parameters:
     ///   - value: The value to assign to the object.
@@ -121,7 +121,7 @@ extension JSObject {
         self.init(context: context, object: object!)
     }
     
-    /// Creates a JavaScript RegExp object, as if by invoking the built-in RegExp constructor.
+    /// Creates a JavaScript `RegExp` object, as if by invoking the built-in `RegExp` constructor.
     ///
     /// - Parameters:
     ///   - pattern: The pattern of regular expression.
@@ -133,7 +133,7 @@ extension JSObject {
         self.init(context: context, object: object!)
     }
     
-    /// Creates a JavaScript Error object, as if by invoking the built-in Error constructor.
+    /// Creates a JavaScript `Error` object, as if by invoking the built-in `Error` constructor.
     ///
     /// - Parameters:
     ///   - message: The error message.
@@ -143,7 +143,7 @@ extension JSObject {
         self.init(context: context, object: JSObjectMakeError(context.context, 1, arguments.map { $0.object }, &context._exception))
     }
     
-    /// Creates a JavaScript object.
+    /// Creates a JavaScript `Object`.
     ///
     /// - Parameters:
     ///   - context: The execution context to use.
@@ -151,7 +151,7 @@ extension JSObject {
         self.init(context: context, object: JSObjectMake(context.context, nil, nil))
     }
     
-    /// Creates a JavaScript object with prototype.
+    /// Creates a JavaScript `Object` with prototype.
     ///
     /// - Parameters:
     ///   - context: The execution context to use.
@@ -161,7 +161,7 @@ extension JSObject {
         self.init(context: context, object: obj.object)
     }
     
-    /// Creates a JavaScript Array object.
+    /// Creates a JavaScript `Array` object.
     ///
     /// - Parameters:
     ///   - context: The execution context to use.
@@ -457,7 +457,6 @@ extension JSObject {
     
     /// The length of the object.
     public var count: Int {
-        guard self.isArray else { return 0 }
         return Int(self["length"].doubleValue ?? 0)
     }
     
