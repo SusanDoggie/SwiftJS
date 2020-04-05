@@ -234,7 +234,6 @@ extension JSObject {
     
     /// Tests whether a JavaScript value’s type is the array type.
     public var isArray: Bool {
-        guard self.isObject else { return false }
         let result = context.global["Array"].invokeMethod("isArray", withArguments: [self])
         return JSValueToBoolean(context.context, result.object)
     }
@@ -251,7 +250,6 @@ extension JSObject {
     
     /// Tests whether a JavaScript value’s type is the error type.
     public var isError: Bool {
-        guard self.isObject else { return false }
         return self.isInstance(of: context.global["Error"])
     }
 }
