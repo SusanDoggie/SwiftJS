@@ -44,9 +44,9 @@ public struct JSPropertyDescriptor {
     
     fileprivate let _setter: JSObject?
     
-    public let getter: ((JSObject) -> JSObject)?
+    public let getter: ((JSObject) throws -> JSObject)?
     
-    public let setter: ((JSObject, JSObject) -> Void)?
+    public let setter: ((JSObject, JSObject) throws -> Void)?
     
     public var configurable: Bool? = nil
     
@@ -154,13 +154,13 @@ extension JSObject {
         if let getter = descriptor._getter {
             desc["get"] = getter
         } else if let getter = descriptor.getter {
-            desc["get"] = JSObject(newFunctionIn: context) { _, this, _ in getter(this!) }
+            desc["get"] = JSObject(newFunctionIn: context) { _, this, _ in try getter(this!) }
         }
         if let setter = descriptor._setter {
             desc["set"] = setter
         } else if let setter = descriptor.setter {
             desc["set"] = JSObject(newFunctionIn: context) { context, this, arguments in
-                setter(this!, arguments[0])
+                try setter(this!, arguments[0])
                 return JSObject(undefinedIn: context)
             }
         }
