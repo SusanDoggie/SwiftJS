@@ -63,7 +63,7 @@ jobs:
       with:
         submodules: recursive
     - name: Install dependencies
-      run: apt-get -q update && apt-get -y install libjavascriptcoregtk-1.0-dev
+      run: apt-get -q update && apt-get -y install libjavascriptcoregtk-4.0-dev
     - name: Build
       run: swift build -c release --enable-test-discovery
     - name: Run tests
