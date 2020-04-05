@@ -33,6 +33,7 @@ import CJSCore
 
 #endif
 
+/// A JavaScript execution context.
 open class JSContext {
     
     public let virtualMachine: JSVirtualMachine
