@@ -260,13 +260,15 @@ extension JSObject {
     /// Tests whether two JavaScript values are equal, as compared by the JS `==` operator.
     /// - Parameter other: The other value to be compare.
     /// - Returns: true if the two values are equal; false if they are not equal or an exception is thrown.
-    public func isEqualWithTypeCoercion(to other: JSObject) -> Bool {return JSValueIsEqual(context.context, object, other.object, &context._exception)
+    public func isEqualWithTypeCoercion(to other: JSObject) -> Bool {
+        return JSValueIsEqual(context.context, object, other.object, &context._exception)
     }
     
     /// Tests whether a JavaScript value is an object constructed by a given constructor, as compared by the `isInstance(of:)` operator.
     /// - Parameter other: The constructor to test against.
     /// - Returns: true if the value is an object constructed by constructor, as compared by the JS isInstance(of:) operator; otherwise false.
-    public func isInstance(of other: JSObject) -> Bool {return JSValueIsInstanceOfConstructor(context.context, object, other.object, &context._exception)
+    public func isInstance(of other: JSObject) -> Bool {
+        return JSValueIsInstanceOfConstructor(context.context, object, other.object, &context._exception)
     }
 }
 
