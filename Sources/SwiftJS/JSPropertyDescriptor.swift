@@ -33,6 +33,27 @@ import CJSCore
 
 #endif
 
+/// A descriptor for property’s definition
+///
+/// The descriptor determines the behavior of the JavaScript property, and must fit one of three cases:
+///
+/// - Data Descriptor: Contains one or both of the keys value and writable, and optionally also contains the keys enumerable or configurable.
+///   Cannot contain the keys get or set. Use a data descriptor to create or modify the attributes of a data property on an object (replacing any
+///   existing accessor property).
+///
+/// - Accessor Descriptor: Contains one or both of the keys get or set, and optionally also contains the keys enumerable or configurable.
+///   Cannot contain the keys value and writable. Use an accessor descriptor to create or modify the attributes of an accessor property on
+///   an object (replacing any existing data property).
+///
+///   For example:
+///
+///       let desc = JSPropertyDescriptor(
+///           getter: { this in this["private_val"] },
+///           setter: { this, newValue in this["private_val"] = newValue }
+///       )
+///
+/// - Generic Descriptor: Contains one or both of the keys enumerable or configurable, and cannot contain any other keys. Use a genetic
+///   descriptor to modify the attributes of an existing data or accessor property, or to create a new data property.
 public struct JSPropertyDescriptor {
     
     public private(set) var value: JSObject? = nil
@@ -95,26 +116,6 @@ public struct JSPropertyDescriptor {
 extension JSObject {
     
     /// Defines a property on the JavaScript object value or modifies a property’s definition.
-    ///
-    /// The descriptor determines the behavior of the JavaScript property, and must fit one of three cases:
-    ///
-    /// - Data Descriptor: Contains one or both of the keys value and writable, and optionally also contains the keys enumerable or configurable.
-    ///   Cannot contain the keys get or set. Use a data descriptor to create or modify the attributes of a data property on an object (replacing any
-    ///   existing accessor property).
-    ///
-    /// - Accessor Descriptor: Contains one or both of the keys get or set, and optionally also contains the keys enumerable or configurable.
-    ///   Cannot contain the keys value and writable. Use an accessor descriptor to create or modify the attributes of an accessor property on
-    ///   an object (replacing any existing data property).
-    ///
-    ///   For example:
-    ///
-    ///       let desc = JSPropertyDescriptor(
-    ///           getter: { this in this["private_val"] },
-    ///           setter: { this, newValue in this["private_val"] = newValue }
-    ///       )
-    ///
-    /// - Generic Descriptor: Contains one or both of the keys enumerable or configurable, and cannot contain any other keys. Use a genetic
-    ///   descriptor to modify the attributes of an existing data or accessor property, or to create a new data property.
     ///
     /// - Parameters:
     ///   - property: The property's name.
