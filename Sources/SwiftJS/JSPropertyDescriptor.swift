@@ -119,6 +119,7 @@ extension JSObject {
     /// - Parameters:
     ///   - property: The property's name.
     ///   - descriptor: The descriptor object.
+    ///   
     /// - Returns: true if the operation succeeds, otherwise false.
     @discardableResult
     public func defineProperty(_ property: String, _ descriptor: JSPropertyDescriptor) -> Bool {

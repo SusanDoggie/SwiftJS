@@ -126,6 +126,11 @@ private func function_instanceof(
 
 extension JSObject {
     
+    /// Creates a JavaScript value of the function type.
+    ///
+    /// - Parameters:
+    ///   - context: The execution context to use.
+    ///   - callback: The callback function.
     public convenience init(newFunctionIn context: JSContext, callback: @escaping JSObjectCallAsFunctionCallback) {
         
         let info: UnsafeMutablePointer<JSObjectCallbackInfo> = .allocate(capacity: 1)

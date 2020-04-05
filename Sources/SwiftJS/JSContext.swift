@@ -102,14 +102,20 @@ extension JSContext {
     }
     
     /// Tests whether global has a given property.
-    /// - Parameter property: The property's name.
+    ///
+    /// - Parameters:
+    ///   - property: The property's name.
+    ///   
     /// - Returns: true if the object has `property`, otherwise false.
     open func hasProperty(_ property: String) -> Bool {
         return global.hasProperty(property)
     }
     
     /// Deletes a property from global.
-    /// - Parameter property: The property's name.
+    /// 
+    /// - Parameters:
+    ///   - property: The property's name.
+    ///   
     /// - Returns: true if the delete operation succeeds, otherwise false.
     @discardableResult
     open func removeProperty(_ property: String) -> Bool {
@@ -129,6 +135,13 @@ extension JSContext {
 extension JSContext {
     
     /// Checks for syntax errors in a string of JavaScript.
+    ///
+    /// - Parameters:
+    ///   - script: The script to check for syntax errors.
+    ///   - sourceURL: A URL for the script's source file. This is only used when reporting exceptions. Pass `nil` to omit source file information in exceptions.
+    ///   - startingLineNumber: An integer value specifying the script's starting line number in the file located at sourceURL. This is only used when reporting exceptions.
+    ///   
+    /// - Returns: true if the script is syntactically correct; otherwise false.
     open func checkScriptSyntax(_ script: String, sourceURL: URL? = nil, startingLineNumber: Int = 0) -> Bool {
         
         let script = script.withCString(JSStringCreateWithUTF8CString)
@@ -141,6 +154,14 @@ extension JSContext {
     }
     
     /// Evaluates a string of JavaScript.
+    ///
+    /// - Parameters:
+    ///   - script: The script to check for syntax errors.
+    ///   - this: The object to use as this or `nil` to use the global object as this.
+    ///   - sourceURL: A URL for the script's source file. This is only used when reporting exceptions. Pass `nil` to omit source file information in exceptions.
+    ///   - startingLineNumber: An integer value specifying the script's starting line number in the file located at sourceURL. This is only used when reporting exceptions.
+    ///   
+    /// - Returns: true if the script is syntactically correct; otherwise false.
     @discardableResult
     open func evaluateScript(_ script: String, this: JSObjectRef? = nil, sourceURL: URL? = nil, startingLineNumber: Int = 0) -> JSObject {
         

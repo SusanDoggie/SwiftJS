@@ -54,26 +54,44 @@ public class JSObject {
 extension JSObject {
     
     /// Creates a JavaScript value of the undefined type.
+    /// 
+    /// - Parameters:
+    ///   - context: The execution context to use.
     public convenience init(undefinedIn context: JSContext) {
         self.init(context: context, object: JSValueMakeUndefined(context.context))
     }
     
     /// Creates a JavaScript value of the null type.
+    ///
+    /// - Parameters:
+    ///   - context: The execution context to use.
     public convenience init(nullIn context: JSContext) {
         self.init(context: context, object: JSValueMakeNull(context.context))
     }
     
     /// Creates a JavaScript Boolean value.
+    ///
+    /// - Parameters:
+    ///   - value: The value to assign to the object.
+    ///   - context: The execution context to use.
     public convenience init(bool value: Bool, in context: JSContext) {
         self.init(context: context, object: JSValueMakeBoolean(context.context, value))
     }
     
     /// Creates a JavaScript value of the number type.
+    ///
+    /// - Parameters:
+    ///   - value: The value to assign to the object.
+    ///   - context: The execution context to use.
     public convenience init(double value: Double, in context: JSContext) {
         self.init(context: context, object: JSValueMakeNumber(context.context, value))
     }
     
     /// Creates a JavaScript value of the string type.
+    ///
+    /// - Parameters:
+    ///   - value: The value to assign to the object.
+    ///   - context: The execution context to use.
     public convenience init(string value: String, in context: JSContext) {
         let value = value.withCString(JSStringCreateWithUTF8CString)
         defer { JSStringRelease(value) }
@@ -81,6 +99,11 @@ extension JSObject {
     }
     
     /// Creates a JavaScript RegExp object, as if by invoking the built-in RegExp constructor.
+    ///
+    /// - Parameters:
+    ///   - pattern: The pattern of regular expression.
+    ///   - flags: The flags pass to the constructor.
+    ///   - context: The execution context to use.
     public convenience init(newRegularExpressionFromPattern pattern: String, flags: String, in context: JSContext) {
         let arguments = [JSObject(string: pattern, in: context), JSObject(string: flags, in: context)]
         let object = JSObjectMakeRegExp(context.context, 2, arguments.map { $0.object }, &context._exception)
@@ -88,23 +111,37 @@ extension JSObject {
     }
     
     /// Creates a JavaScript Error object, as if by invoking the built-in Error constructor.
+    ///
+    /// - Parameters:
+    ///   - message: The error message.
+    ///   - context: The execution context to use.
     public convenience init(newErrorFromMessage message: String, in context: JSContext) {
         let arguments = [JSObject(string: message, in: context)]
         self.init(context: context, object: JSObjectMakeError(context.context, 1, arguments.map { $0.object }, &context._exception))
     }
     
     /// Creates a JavaScript object.
+    ///
+    /// - Parameters:
+    ///   - context: The execution context to use.
     public convenience init(newObjectIn context: JSContext) {
         self.init(context: context, object: JSObjectMake(context.context, nil, nil))
     }
     
     /// Creates a JavaScript object with prototype.
+    ///
+    /// - Parameters:
+    ///   - context: The execution context to use.
+    ///   - prototype: The prototype to be used.
     public convenience init(newObjectIn context: JSContext, prototype: JSObject) {
         let obj = context.global["Object"].invokeMethod("create", withArguments: [prototype])
         self.init(context: context, object: obj.object)
     }
     
     /// Creates a JavaScript Array object.
+    ///
+    /// - Parameters:
+    ///   - context: The execution context to use.
     public convenience init(newArrayIn context: JSContext) {
         self.init(context: context, object: JSObjectMakeArray(context.context, 0, nil, &context._exception))
     }
@@ -259,6 +296,12 @@ extension JSObject {
 extension JSObject {
     
     /// Calls an object as a function.
+    ///
+    /// - Parameters:
+    ///   - arguments: The arguments pass to the function.
+    ///   - this: The object to use as `this`, or `nil` to use the global object as `this`.
+    ///
+    /// - Returns: The object that results from calling object as a function
     @discardableResult
     public func call(withArguments arguments: [JSObject], this: JSObject? = nil) -> JSObject {
         let result = JSObjectCallAsFunction(context.context, object, this?.object, arguments.count, arguments.isEmpty ? nil : arguments.map { $0.object }, &context._exception)
@@ -266,12 +309,23 @@ extension JSObject {
     }
     
     /// Calls an object as a constructor.
+    ///
+    /// - Parameters:
+    ///   - arguments: The arguments pass to the function.
+    ///   
+    /// - Returns: The object that results from calling object as a constructor.
     public func construct(withArguments arguments: [JSObject]) -> JSObject {
         let result = JSObjectCallAsConstructor(context.context, object, arguments.count, arguments.isEmpty ? nil : arguments.map { $0.object }, &context._exception)
         return result.map { JSObject(context: context, object: $0) } ?? JSObject(undefinedIn: context)
     }
     
     /// Invoke an object's method.
+    ///
+    /// - Parameters:
+    ///   - name: The name of method.
+    ///   - arguments: The arguments pass to the function.
+    ///
+    /// - Returns: The object that results from calling the method.
     @discardableResult
     public func invokeMethod(_ name: String, withArguments arguments: [JSObject]) -> JSObject {
         return self[name].call(withArguments: arguments, this: self)
@@ -281,21 +335,30 @@ extension JSObject {
 extension JSObject {
     
     /// Tests whether two JavaScript values are strict equal, as compared by the JS `===` operator.
-    /// - Parameter other: The other value to be compare.
+    ///
+    /// - Parameters:
+    ///   - other: The other value to be compare.
+    ///   
     /// - Returns: true if the two values are strict equal; otherwise false.
     public func isEquål(to other: JSObject) -> Bool {
         return JSValueIsStrictEqual(context.context, object, other.object)
     }
     
     /// Tests whether two JavaScript values are equal, as compared by the JS `==` operator.
-    /// - Parameter other: The other value to be compare.
+    ///
+    /// - Parameters:
+    ///   - other: The other value to be compare.
+    ///   
     /// - Returns: true if the two values are equal; false if they are not equal or an exception is thrown.
     public func isEqualWithTypeCoercion(to other: JSObject) -> Bool {
         return JSValueIsEqual(context.context, object, other.object, &context._exception)
     }
     
     /// Tests whether a JavaScript value is an object constructed by a given constructor, as compared by the `isInstance(of:)` operator.
-    /// - Parameter other: The constructor to test against.
+    ///
+    /// - Parameters:
+    ///   - other: The constructor to test against.
+    ///   
     /// - Returns: true if the value is an object constructed by constructor, as compared by the JS isInstance(of:) operator; otherwise false.
     public func isInstance(of other: JSObject) -> Bool {
         return JSValueIsInstanceOfConstructor(context.context, object, other.object, &context._exception)
@@ -318,7 +381,10 @@ extension JSObject {
     }
     
     /// Tests whether an object has a given property.
-    /// - Parameter property: The property's name.
+    ///
+    /// - Parameters:
+    ///   - property: The property's name.
+    ///   
     /// - Returns: true if the object has `property`, otherwise false.
     public func hasProperty(_ property: String) -> Bool {
         let property = property.withCString(JSStringCreateWithUTF8CString)
@@ -327,7 +393,10 @@ extension JSObject {
     }
     
     /// Deletes a property from an object.
-    /// - Parameter property: The property's name.
+    ///
+    /// - Parameters:
+    ///   - property: The property's name.
+    ///   
     /// - Returns: true if the delete operation succeeds, otherwise false.
     @discardableResult
     public func removeProperty(_ property: String) -> Bool {
