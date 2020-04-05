@@ -35,35 +35,40 @@ import CJSCore
 
 public struct JSPropertyDescriptor {
     
-    public let value: JSObject?
+    public private(set) var value: JSObject? = nil
     
-    public let writable: Bool?
+    public private(set) var writable: Bool? = nil
     
-    let _getter: JSObject?
+    fileprivate private(set) var _getter: JSObject? = nil
     
-    let _setter: JSObject?
+    fileprivate private(set) var _setter: JSObject? = nil
     
-    public let getter: ((JSObject) -> JSObject)?
+    public private(set) var getter: ((JSObject) -> JSObject)? = nil
     
-    public let setter: ((JSObject, JSObject) -> Void)?
+    public private(set) var setter: ((JSObject, JSObject) -> Void)? = nil
     
-    public let configurable: Bool?
+    public private(set) var configurable: Bool? = nil
     
-    public let enumerable: Bool?
+    public private(set) var enumerable: Bool? = nil
     
     public init(
         value: JSObject? = nil,
         writable: Bool? = nil,
+        configurable: Bool? = nil,
+        enumerable: Bool? = nil
+    ) {
+        self.value = value
+        self.writable = writable
+        self.configurable = configurable
+        self.enumerable = enumerable
+    }
+    
+    public init(
         getter: ((JSObject) -> JSObject)? = nil,
         setter: ((JSObject, JSObject) -> Void)? = nil,
         configurable: Bool? = nil,
         enumerable: Bool? = nil
     ) {
-        precondition((value == nil && writable == nil) || (getter == nil && setter == nil), "Invalid descriptor type")
-        self.value = value
-        self.writable = writable
-        self._getter = nil
-        self._setter = nil
         self.getter = getter
         self.setter = setter
         self.configurable = configurable
@@ -78,8 +83,6 @@ public struct JSPropertyDescriptor {
     ) {
         precondition(getter?.isFunction != false, "Invalid getter type")
         precondition(setter?.isFunction != false, "Invalid setter type")
-        self.value = nil
-        self.writable = nil
         self._getter = getter
         self._setter = setter
         self.getter = getter.map { getter in { this in
