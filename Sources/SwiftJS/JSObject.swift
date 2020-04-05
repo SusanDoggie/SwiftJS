@@ -33,6 +33,7 @@ import CJSCore
 
 #endif
 
+/// A JavaScript object.
 public class JSObject {
     
     public let context: JSContext
@@ -52,48 +53,58 @@ public class JSObject {
 
 extension JSObject {
     
+    /// Creates a JavaScript value of the undefined type.
     public convenience init(undefinedIn context: JSContext) {
         self.init(context: context, object: JSValueMakeUndefined(context.context))
     }
     
+    /// Creates a JavaScript value of the null type.
     public convenience init(nullIn context: JSContext) {
         self.init(context: context, object: JSValueMakeNull(context.context))
     }
     
+    /// Creates a JavaScript Boolean value.
     public convenience init(bool value: Bool, in context: JSContext) {
         self.init(context: context, object: JSValueMakeBoolean(context.context, value))
     }
     
+    /// Creates a JavaScript value of the number type.
     public convenience init(double value: Double, in context: JSContext) {
         self.init(context: context, object: JSValueMakeNumber(context.context, value))
     }
     
+    /// Creates a JavaScript value of the string type.
     public convenience init(string value: String, in context: JSContext) {
         let value = value.withCString(JSStringCreateWithUTF8CString)
         defer { JSStringRelease(value) }
         self.init(context: context, object: JSValueMakeString(context.context, value))
     }
     
+    /// Creates a JavaScript RegExp object, as if by invoking the built-in RegExp constructor.
     public convenience init(newRegularExpressionFromPattern pattern: String, flags: String, in context: JSContext) {
         let arguments = [JSObject(string: pattern, in: context), JSObject(string: flags, in: context)]
         let object = JSObjectMakeRegExp(context.context, 2, arguments.map { $0.object }, &context._exception)
         self.init(context: context, object: object!)
     }
     
+    /// Creates a JavaScript Error object, as if by invoking the built-in Error constructor.
     public convenience init(newErrorFromMessage message: String, in context: JSContext) {
         let arguments = [JSObject(string: message, in: context)]
         self.init(context: context, object: JSObjectMakeError(context.context, 1, arguments.map { $0.object }, &context._exception))
     }
     
+    /// Creates a JavaScript object.
     public convenience init(newObjectIn context: JSContext) {
         self.init(context: context, object: JSObjectMake(context.context, nil, nil))
     }
     
+    /// Creates a JavaScript object with prototype.
     public convenience init(newObjectIn context: JSContext, prototype: JSObject) {
         let obj = context.global["Object"].invokeMethod("create", withArguments: [prototype])
         self.init(context: context, object: obj.object)
     }
     
+    /// Creates a JavaScript Array object.
     public convenience init(newArrayIn context: JSContext) {
         self.init(context: context, object: JSObjectMakeArray(context.context, 0, nil, &context._exception))
     }
@@ -117,6 +128,7 @@ extension JSObject: Error {
 
 extension JSObject {
     
+    /// Object’s prototype.
     public var prototype: JSObject {
         get {
             let prototype = JSObjectGetPrototype(context.context, object)
@@ -130,44 +142,54 @@ extension JSObject {
 
 extension JSObject {
     
+    /// Tests whether a JavaScript value’s type is the undefined type.
     public var isUndefined: Bool {
         return JSValueIsUndefined(context.context, object)
     }
     
+    /// Tests whether a JavaScript value’s type is the null type.
     public var isNull: Bool {
         return JSValueIsNull(context.context, object)
     }
     
+    /// Tests whether a JavaScript value is Boolean.
     public var isBoolean: Bool {
         return JSValueIsBoolean(context.context, object)
     }
     
+    /// Tests whether a JavaScript value’s type is the number type.
     public var isNumber: Bool {
         return JSValueIsNumber(context.context, object)
     }
     
+    /// Tests whether a JavaScript value’s type is the string type.
     public var isString: Bool {
         return JSValueIsString(context.context, object)
     }
     
+    /// Tests whether a JavaScript value’s type is the object type.
     public var isObject: Bool {
         return JSValueIsObject(context.context, object)
     }
     
+    /// Tests whether a JavaScript value’s type is the array type.
     public var isArray: Bool {
         guard self.isObject else { return false }
         let result = context.global["Array"].invokeMethod("isArray", withArguments: [self])
         return JSValueToBoolean(context.context, result.object)
     }
     
+    /// Tests whether an object can be called as a constructor.
     public var isConstructor: Bool {
         return JSObjectIsConstructor(context.context, object)
     }
     
+    /// Tests whether an object can be called as a function.
     public var isFunction: Bool {
         return JSObjectIsFunction(context.context, object)
     }
     
+    /// Tests whether a JavaScript value’s type is the error type.
     public var isError: Bool {
         guard self.isObject else { return false }
         return self.isInstance(of: context.global["Error"])
@@ -203,27 +225,32 @@ extension JSObject {
 
 extension JSObject {
     
+    /// Converts a JavaScript value to a Boolean and returns the resulting Boolean.
     public var boolValue: Bool {
         return JSValueToBoolean(context.context, object)
     }
     
+    /// Converts a JavaScript value to number and returns the resulting number.
     public var doubleValue: Double? {
         var exception: JSObjectRef?
         let result = JSValueToNumber(context.context, object, &exception)
         return exception == nil ? result : nil
     }
     
+    /// Converts a JavaScript value to string and returns the resulting string.
     public var stringValue: String? {
         let str = JSValueToStringCopy(context.context, object, nil)
         defer { str.map(JSStringRelease) }
         return str.map(String.init)
     }
     
+    /// Returns the JavaScript array.
     public var array: [JSObject]? {
         guard self.isArray else { return nil }
         return (0..<self.count).map { self[$0] }
     }
     
+    /// Returns the JavaScript object as dictionary.
     public var dictionary: [String: JSObject] {
         return self.properties.reduce(into: [:]) { $0[$1] = self[$1] }
     }
@@ -231,17 +258,20 @@ extension JSObject {
 
 extension JSObject {
     
+    /// Calls an object as a function.
     @discardableResult
     public func call(withArguments arguments: [JSObject], this: JSObject? = nil) -> JSObject {
         let result = JSObjectCallAsFunction(context.context, object, this?.object, arguments.count, arguments.isEmpty ? nil : arguments.map { $0.object }, &context._exception)
         return result.map { JSObject(context: context, object: $0) } ?? JSObject(undefinedIn: context)
     }
     
+    /// Calls an object as a constructor.
     public func construct(withArguments arguments: [JSObject]) -> JSObject {
         let result = JSObjectCallAsConstructor(context.context, object, arguments.count, arguments.isEmpty ? nil : arguments.map { $0.object }, &context._exception)
         return result.map { JSObject(context: context, object: $0) } ?? JSObject(undefinedIn: context)
     }
     
+    /// Invoke an object's method.
     @discardableResult
     public func invokeMethod(_ name: String, withArguments arguments: [JSObject]) -> JSObject {
         return self[name].call(withArguments: arguments, this: self)
@@ -306,6 +336,7 @@ extension JSObject {
         return JSObjectDeleteProperty(context.context, object, property, &context._exception)
     }
     
+    /// The value of the property.
     public subscript(property: String) -> JSObject {
         get {
             let property = JSStringCreateWithUTF8CString(property)
@@ -323,11 +354,13 @@ extension JSObject {
 
 extension JSObject {
     
+    /// The length of the object.
     public var count: Int {
         guard self.isArray else { return 0 }
         return Int(self["length"].doubleValue ?? 0)
     }
     
+    /// The value in object at index.
     public subscript(index: Int) -> JSObject {
         get {
             let result = JSObjectGetPropertyAtIndex(context.context, object, UInt32(index), &context._exception)

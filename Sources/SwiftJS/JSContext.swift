@@ -80,10 +80,15 @@ extension JSContext {
 
 extension JSContext {
     
+    /// The global object.
     open var global: JSObject {
         return JSObject(context: self, object: JSContextGetGlobalObject(context))
     }
     
+    /// Performs a JavaScript garbage collection.
+    ///
+    /// During JavaScript execution, you are not required to call this function; the JavaScript engine will garbage collect as needed.
+    /// JavaScript values created within a context group are automatically destroyed when the last reference to the context group is released.
     open func garbageCollect() {
         JSGarbageCollect(context)
     }
@@ -91,14 +96,21 @@ extension JSContext {
 
 extension JSContext {
     
+    /// Get the names of global’s enumerable properties
     open var properties: [String] {
         return global.properties
     }
     
+    /// Tests whether global has a given property.
+    /// - Parameter property: The property's name.
+    /// - Returns: true if the object has `property`, otherwise false.
     open func hasProperty(_ property: String) -> Bool {
         return global.hasProperty(property)
     }
     
+    /// Deletes a property from global.
+    /// - Parameter property: The property's name.
+    /// - Returns: true if the delete operation succeeds, otherwise false.
     @discardableResult
     open func removeProperty(_ property: String) -> Bool {
         return global.removeProperty(property)
@@ -116,6 +128,7 @@ extension JSContext {
 
 extension JSContext {
     
+    /// Checks for syntax errors in a string of JavaScript.
     open func checkScriptSyntax(_ script: String, sourceURL: URL? = nil, startingLineNumber: Int = 0) -> Bool {
         
         let script = script.withCString(JSStringCreateWithUTF8CString)
@@ -127,6 +140,7 @@ extension JSContext {
         return JSCheckScriptSyntax(context, script, sourceURL, Int32(startingLineNumber), &_exception)
     }
     
+    /// Evaluates a string of JavaScript.
     @discardableResult
     open func evaluateScript(_ script: String, this: JSObjectRef? = nil, sourceURL: URL? = nil, startingLineNumber: Int = 0) -> JSObject {
         
