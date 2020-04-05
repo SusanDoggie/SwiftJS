@@ -34,26 +34,6 @@ import CJSCore
 #endif
 
 /// A descriptor for property’s definition
-///
-/// The descriptor determines the behavior of the JavaScript property, and must fit one of three cases:
-///
-/// - Data Descriptor: Contains one or both of the keys value and writable, and optionally also contains the keys enumerable or configurable.
-///   Cannot contain the keys get or set. Use a data descriptor to create or modify the attributes of a data property on an object (replacing any
-///   existing accessor property).
-///
-/// - Accessor Descriptor: Contains one or both of the keys get or set, and optionally also contains the keys enumerable or configurable.
-///   Cannot contain the keys value and writable. Use an accessor descriptor to create or modify the attributes of an accessor property on
-///   an object (replacing any existing data property).
-///
-///   For example:
-///
-///       let desc = JSPropertyDescriptor(
-///           getter: { this in this["private_val"] },
-///           setter: { this, newValue in this["private_val"] = newValue }
-///       )
-///
-/// - Generic Descriptor: Contains one or both of the keys enumerable or configurable, and cannot contain any other keys. Use a genetic
-///   descriptor to modify the attributes of an existing data or accessor property, or to create a new data property.
 public struct JSPropertyDescriptor {
     
     public let value: JSObject?
@@ -72,6 +52,10 @@ public struct JSPropertyDescriptor {
     
     public var enumerable: Bool? = nil
     
+    /// Generic Descriptor
+    ///
+    /// Contains one or both of the keys enumerable or configurable. Use a genetic descriptor to modify the attributes of an existing
+    /// data or accessor property, or to create a new data property.
     public init() {
         self.value = nil
         self.writable = nil
@@ -81,6 +65,10 @@ public struct JSPropertyDescriptor {
         self.setter = nil
     }
     
+    /// Data Descriptor
+    ///
+    /// Contains one or both of the keys value and writable, and optionally also contains the keys enumerable or configurable. Use a
+    /// data descriptor to create or modify the attributes of a data property on an object (replacing any existing accessor property).
     public init(
         value: JSObject? = nil,
         writable: Bool? = nil,
@@ -97,6 +85,17 @@ public struct JSPropertyDescriptor {
         self.enumerable = enumerable
     }
     
+    /// Accessor Descriptor
+    ///
+    /// Contains one or both of the keys get or set, and optionally also contains the keys enumerable or configurable. Use an accessor
+    /// descriptor to create or modify the attributes of an accessor property on an object (replacing any existing data property).
+    ///
+    /// ```
+    /// let desc = JSPropertyDescriptor(
+    ///     getter: { this in this["private_val"] },
+    ///     setter: { this, newValue in this["private_val"] = newValue }
+    /// )
+    /// ```
     public init(
         getter: ((JSObject) -> JSObject)? = nil,
         setter: ((JSObject, JSObject) -> Void)? = nil,
@@ -113,6 +112,10 @@ public struct JSPropertyDescriptor {
         self.enumerable = enumerable
     }
     
+    /// Accessor Descriptor
+    ///
+    /// Contains one or both of the keys get or set, and optionally also contains the keys enumerable or configurable. Use an accessor
+    /// descriptor to create or modify the attributes of an accessor property on an object (replacing any existing data property).
     public init(
         getter: JSObject? = nil,
         setter: JSObject? = nil,
