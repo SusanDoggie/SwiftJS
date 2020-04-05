@@ -27,7 +27,7 @@ A cross platform Javascript engine for Swift.
 
 For Ubuntu, you need to install JavaScriptCore
 
-    apt-get -y install libjavascriptcoregtk-1.0-dev
+    apt-get -y install libjavascriptcoregtk-4.0-dev
 
 ## Contributing
 

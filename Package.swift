@@ -43,7 +43,7 @@ targets.append(
             "CJSCore",
         ],
         cSettings: [
-            .unsafeFlags(["-I/usr/include/webkitgtk-1.0"]),
+            .unsafeFlags(["-I/usr/include/webkitgtk-4.0"]),
         ]
     )
 )
