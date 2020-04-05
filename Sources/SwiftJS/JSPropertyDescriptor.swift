@@ -56,21 +56,30 @@ import CJSCore
 ///   descriptor to modify the attributes of an existing data or accessor property, or to create a new data property.
 public struct JSPropertyDescriptor {
     
-    public private(set) var value: JSObject? = nil
+    public let value: JSObject?
     
-    public private(set) var writable: Bool? = nil
+    public let writable: Bool?
     
-    fileprivate private(set) var _getter: JSObject? = nil
+    fileprivate let _getter: JSObject?
     
-    fileprivate private(set) var _setter: JSObject? = nil
+    fileprivate let _setter: JSObject?
     
-    public private(set) var getter: ((JSObject) -> JSObject)? = nil
+    public let getter: ((JSObject) -> JSObject)?
     
-    public private(set) var setter: ((JSObject, JSObject) -> Void)? = nil
+    public let setter: ((JSObject, JSObject) -> Void)?
     
-    public private(set) var configurable: Bool? = nil
+    public var configurable: Bool? = nil
     
-    public private(set) var enumerable: Bool? = nil
+    public var enumerable: Bool? = nil
+    
+    public init() {
+        self.value = nil
+        self.writable = nil
+        self._getter = nil
+        self._setter = nil
+        self.getter = nil
+        self.setter = nil
+    }
     
     public init(
         value: JSObject? = nil,
@@ -80,6 +89,10 @@ public struct JSPropertyDescriptor {
     ) {
         self.value = value
         self.writable = writable
+        self._getter = nil
+        self._setter = nil
+        self.getter = nil
+        self.setter = nil
         self.configurable = configurable
         self.enumerable = enumerable
     }
@@ -90,6 +103,10 @@ public struct JSPropertyDescriptor {
         configurable: Bool? = nil,
         enumerable: Bool? = nil
     ) {
+        self.value = nil
+        self.writable = nil
+        self._getter = nil
+        self._setter = nil
         self.getter = getter
         self.setter = setter
         self.configurable = configurable
@@ -104,6 +121,8 @@ public struct JSPropertyDescriptor {
     ) {
         precondition(getter?.isFunction != false, "Invalid getter type")
         precondition(setter?.isFunction != false, "Invalid setter type")
+        self.value = nil
+        self.writable = nil
         self._getter = getter
         self._setter = setter
         self.getter = getter.map { getter in { this in getter.call(withArguments: [], this: this) } }
