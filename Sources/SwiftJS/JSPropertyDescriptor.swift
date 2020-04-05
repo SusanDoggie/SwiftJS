@@ -85,15 +85,8 @@ public struct JSPropertyDescriptor {
         precondition(setter?.isFunction != false, "Invalid setter type")
         self._getter = getter
         self._setter = setter
-        self.getter = getter.map { getter in { this in
-            let context = this.context
-            let result = JSObjectCallAsFunction(context.context, getter.object, this.object, 0, nil, &context._exception)
-            return result.map { JSObject(context: context, object: $0) } ?? JSObject(undefinedIn: context)
-            } }
-        self.setter = setter.map { setter in { this, newValue in
-            let context = this.context
-            JSObjectCallAsFunction(context.context, setter.object, this.object, 1, [newValue.object], &context._exception)
-            } }
+        self.getter = getter.map { getter in { this in getter.call(withArguments: [], this: this) } }
+        self.setter = setter.map { setter in { this, newValue in setter.call(withArguments: [newValue], this: this) } }
         self.configurable = configurable
         self.enumerable = enumerable
     }

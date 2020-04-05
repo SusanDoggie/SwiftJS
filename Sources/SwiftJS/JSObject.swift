@@ -232,8 +232,8 @@ extension JSObject {
 extension JSObject {
     
     @discardableResult
-    public func call(withArguments arguments: [JSObject]) -> JSObject {
-        let result = JSObjectCallAsFunction(context.context, object, nil, arguments.count, arguments.isEmpty ? nil : arguments.map { $0.object }, &context._exception)
+    public func call(withArguments arguments: [JSObject], this: JSObject? = nil) -> JSObject {
+        let result = JSObjectCallAsFunction(context.context, object, this?.object, arguments.count, arguments.isEmpty ? nil : arguments.map { $0.object }, &context._exception)
         return result.map { JSObject(context: context, object: $0) } ?? JSObject(undefinedIn: context)
     }
     
@@ -244,8 +244,7 @@ extension JSObject {
     
     @discardableResult
     public func invokeMethod(_ name: String, withArguments arguments: [JSObject]) -> JSObject {
-        let result = JSObjectCallAsFunction(context.context, self[name].object, object, arguments.count, arguments.isEmpty ? nil : arguments.map { $0.object }, &context._exception)
-        return result.map { JSObject(context: context, object: $0) } ?? JSObject(undefinedIn: context)
+        return self[name].call(withArguments: arguments, this: self)
     }
 }
 

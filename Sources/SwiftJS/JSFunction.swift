@@ -81,7 +81,7 @@ private func function_constructor(
 private func function_callback(
     _ ctx: JSContextRef?,
     _ object: JSObjectRef?,
-    _ thisObject: JSObjectRef?,
+    _ this: JSObjectRef?,
     _ argumentCount: Int,
     _ arguments: UnsafePointer<JSValueRef?>?,
     _ exception: UnsafeMutablePointer<JSValueRef?>?
@@ -92,9 +92,9 @@ private func function_callback(
     
     do {
         
-        let thisObject = thisObject.map { JSObject(context: context, object: $0) }
+        let this = this.map { JSObject(context: context, object: $0) }
         let arguments = (0..<argumentCount).map { JSObject(context: context, object: arguments![$0]!) }
-        let result = try info.pointee.callback(context, thisObject, arguments)
+        let result = try info.pointee.callback(context, this, arguments)
         
         return result.object
         
