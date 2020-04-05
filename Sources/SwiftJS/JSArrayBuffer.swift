@@ -90,7 +90,7 @@ extension JSObject {
     
     /// Copy the bytes of `ArrayBuffer`.
     @available(macOS 10.12, iOS 10.0, tvOS 10.0, *)
-    public var bytesValue: Data? {
+    public func copyBytes() -> Data? {
         guard self.isArrayBuffer else { return nil }
         let length = JSObjectGetArrayBufferByteLength(context.context, object, &context._exception)
         return Data(bytes: JSObjectGetArrayBufferBytesPtr(context.context, object, &context._exception), count: length)
