@@ -253,7 +253,7 @@ extension JSObject {
     /// Tests whether two JavaScript values are strict equal, as compared by the JS `===` operator.
     /// - Parameter other: The other value to be compare.
     /// - Returns: true if the two values are strict equal; otherwise false.
-    public func isEquåal(to other: JSObject) -> Bool {
+    public func isEquål(to other: JSObject) -> Bool {
         return JSValueIsStrictEqual(context.context, object, other.object)
     }
     
