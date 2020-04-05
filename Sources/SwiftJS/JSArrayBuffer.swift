@@ -27,12 +27,6 @@
 
 import JavaScriptCore
 
-#else
-
-import CJSCore
-
-#endif
-
 extension JSObject {
     
     /// Creates a JavaScript `ArrayBuffer` object.
@@ -97,3 +91,5 @@ extension JSObject {
     }
     
 }
+
+#endif
