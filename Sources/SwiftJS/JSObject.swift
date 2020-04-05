@@ -53,6 +53,18 @@ public class JSObject {
 
 extension JSObject {
     
+    private static let rfc3339: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
+        formatter.timeZone = TimeZone(abbreviation: "UTC")
+        return formatter
+    }()
+    
+}
+
+extension JSObject {
+    
     /// Creates a JavaScript value of the undefined type.
     /// 
     /// - Parameters:
@@ -96,6 +108,17 @@ extension JSObject {
         let value = value.withCString(JSStringCreateWithUTF8CString)
         defer { JSStringRelease(value) }
         self.init(context: context, object: JSValueMakeString(context.context, value))
+    }
+    
+    /// Creates a JavaScript value of the date type.
+    ///
+    /// - Parameters:
+    ///   - value: The value to assign to the object.
+    ///   - context: The execution context to use.
+    public convenience init(date value: Date, in context: JSContext) {
+        let arguments = [JSObject(string: JSObject.rfc3339.string(from: value), in: context)]
+        let object = JSObjectMakeDate(context.context, 1, arguments.map { $0.object }, &context._exception)
+        self.init(context: context, object: object!)
     }
     
     /// Creates a JavaScript RegExp object, as if by invoking the built-in RegExp constructor.
@@ -262,23 +285,29 @@ extension JSObject {
 
 extension JSObject {
     
-    /// Converts a JavaScript value to a Boolean and returns the resulting Boolean.
+    /// Returns the JavaScript boolean value.
     public var boolValue: Bool {
         return JSValueToBoolean(context.context, object)
     }
     
-    /// Converts a JavaScript value to number and returns the resulting number.
+    /// Returns the JavaScript number value.
     public var doubleValue: Double? {
         var exception: JSObjectRef?
         let result = JSValueToNumber(context.context, object, &exception)
         return exception == nil ? result : nil
     }
     
-    /// Converts a JavaScript value to string and returns the resulting string.
+    /// Returns the JavaScript string value.
     public var stringValue: String? {
         let str = JSValueToStringCopy(context.context, object, nil)
         defer { str.map(JSStringRelease) }
         return str.map(String.init)
+    }
+    
+    /// Returns the JavaScript date value.
+    public var dateValue: Date? {
+        let result = self.invokeMethod("toISOString", withArguments: [])
+        return result.stringValue.flatMap { JSObject.rfc3339.date(from: $0) }
     }
     
     /// Returns the JavaScript array.
