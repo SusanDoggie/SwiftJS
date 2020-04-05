@@ -33,15 +33,15 @@ import CJSCore
 
 #endif
 
-public class JSContext {
+open class JSContext {
     
     public let virtualMachine: JSVirtualMachine
     
     let context: JSGlobalContextRef
     
-    public private(set) var exception: JSObject?
+    open private(set) var exception: JSObject?
     
-    public var exceptionHandler: ((JSContext, JSObject) -> Void)?
+    open var exceptionHandler: ((JSContext, JSObject) -> Void)?
     
     public convenience init() {
         self.init(virtualMachine: JSVirtualMachine())
@@ -80,31 +80,31 @@ extension JSContext {
 
 extension JSContext {
     
-    public var global: JSObject {
+    open var global: JSObject {
         return JSObject(context: self, object: JSContextGetGlobalObject(context))
     }
     
-    public func garbageCollect() {
+    open func garbageCollect() {
         JSGarbageCollect(context)
     }
 }
 
 extension JSContext {
     
-    public var properties: [String] {
+    open var properties: [String] {
         return global.properties
     }
     
-    public func hasProperty(_ property: String) -> Bool {
+    open func hasProperty(_ property: String) -> Bool {
         return global.hasProperty(property)
     }
     
     @discardableResult
-    public func removeProperty(_ property: String) -> Bool {
+    open func removeProperty(_ property: String) -> Bool {
         return global.removeProperty(property)
     }
     
-    public subscript(property: String) -> JSObject {
+    open subscript(property: String) -> JSObject {
         get {
             return global[property]
         }
@@ -116,7 +116,7 @@ extension JSContext {
 
 extension JSContext {
     
-    public func checkScriptSyntax(_ script: String, sourceURL: URL? = nil, startingLineNumber: Int = 0) -> Bool {
+    open func checkScriptSyntax(_ script: String, sourceURL: URL? = nil, startingLineNumber: Int = 0) -> Bool {
         
         let script = script.withCString(JSStringCreateWithUTF8CString)
         defer { JSStringRelease(script) }
@@ -128,7 +128,7 @@ extension JSContext {
     }
     
     @discardableResult
-    public func evaluateScript(_ script: String, thisObject: JSObjectRef? = nil, sourceURL: URL? = nil, startingLineNumber: Int = 0) -> JSObject {
+    open func evaluateScript(_ script: String, thisObject: JSObjectRef? = nil, sourceURL: URL? = nil, startingLineNumber: Int = 0) -> JSObject {
         
         let script = script.withCString(JSStringCreateWithUTF8CString)
         defer { JSStringRelease(script) }

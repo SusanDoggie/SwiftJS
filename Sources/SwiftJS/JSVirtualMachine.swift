@@ -33,7 +33,7 @@ import CJSCore
 
 #endif
 
-public class JSVirtualMachine {
+open class JSVirtualMachine {
     
     let group: JSContextGroupRef
     
