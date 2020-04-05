@@ -32,182 +32,141 @@ class SwiftJSTest: XCTestCase {
         
         let context = JSContext()
         
-        do {
-            
-            let result = try context.evaluateScript("1 + 1")
-            
-            XCTAssertTrue(result.isNumber)
-            XCTAssertEqual(result.doubleValue, 2)
-            
-        } catch let error {
-            
-            XCTFail("\((error as? JSObject)?["message"] ?? error)")
-        }
+        let result = context.evaluateScript("1 + 1")
+        XCTAssertNil(context.exception, "\(context.exception!)")
+        
+        XCTAssertTrue(result.isNumber)
+        XCTAssertEqual(result.doubleValue, 2)
     }
     
     func testArray() {
         
         let context = JSContext()
         
-        do {
-            
-            let result = try context.evaluateScript("[1 + 2, \"BMW\", \"Volvo\"]")
-            
-            XCTAssertTrue(result.isArray)
-            
-            let length = result["length"]
-            XCTAssertEqual(length.doubleValue, 3)
-            
-            XCTAssertEqual(result[0].doubleValue, 3)
-            XCTAssertEqual(result[1].stringValue, "BMW")
-            XCTAssertEqual(result[2].stringValue, "Volvo")
-            
-        } catch let error {
-            
-            XCTFail("\((error as? JSObject)?["message"] ?? error)")
-        }
+        let result = context.evaluateScript("[1 + 2, \"BMW\", \"Volvo\"]")
+        XCTAssertNil(context.exception, "\(context.exception!)")
+        
+        XCTAssertTrue(result.isArray)
+        
+        let length = result["length"]
+        XCTAssertEqual(length.doubleValue, 3)
+        
+        XCTAssertEqual(result[0].doubleValue, 3)
+        XCTAssertEqual(result[1].stringValue, "BMW")
+        XCTAssertEqual(result[2].stringValue, "Volvo")
     }
     
     func testFunction1() {
         
         let context = JSContext()
         
-        do {
+        let myFunction = JSObject(newFunctionIn: context) { context, this, arguments in
             
-            let myFunction = JSObject(newFunctionIn: context) { context, this, arguments in
-                
-                let result = arguments[0].doubleValue! + arguments[1].doubleValue!
-                
-                return JSObject(double: result, in: context)
-            }
+            let result = arguments[0].doubleValue! + arguments[1].doubleValue!
             
-            XCTAssertTrue(myFunction.isFunction)
-            
-            let result = try myFunction.call(withArguments: [JSObject(double: 1, in: context), JSObject(double: 2, in: context)])
-            
-            XCTAssertTrue(result.isNumber)
-            XCTAssertEqual(result.doubleValue, 3)
-            
-        } catch let error {
-            
-            XCTFail("\((error as? JSObject)?["message"] ?? error)")
+            return JSObject(double: result, in: context)
         }
+        
+        XCTAssertTrue(myFunction.isFunction)
+        
+        let result = myFunction.call(withArguments: [JSObject(double: 1, in: context), JSObject(double: 2, in: context)])
+        XCTAssertNil(context.exception, "\(context.exception!)")
+        
+        XCTAssertTrue(result.isNumber)
+        XCTAssertEqual(result.doubleValue, 3)
     }
     
     func testFunction2() {
         
         let context = JSContext()
         
-        do {
+        let myFunction = JSObject(newFunctionIn: context) { context, this, arguments in
             
-            let myFunction = JSObject(newFunctionIn: context) { context, this, arguments in
-                
-                let result = arguments[0].doubleValue! + arguments[1].doubleValue!
-                
-                return JSObject(double: result, in: context)
-            }
+            let result = arguments[0].doubleValue! + arguments[1].doubleValue!
             
-            XCTAssertTrue(myFunction.isFunction)
-            
-            context.global["myFunction"] = myFunction
-            
-            let result = try context.evaluateScript("myFunction(1, 2)")
-            
-            XCTAssertTrue(result.isNumber)
-            XCTAssertEqual(result.doubleValue, 3)
-            
-        } catch let error {
-            
-            XCTFail("\((error as? JSObject)?["message"] ?? error)")
+            return JSObject(double: result, in: context)
         }
+        
+        XCTAssertTrue(myFunction.isFunction)
+        
+        context.global["myFunction"] = myFunction
+        
+        let result = context.evaluateScript("myFunction(1, 2)")
+        XCTAssertNil(context.exception, "\(context.exception!)")
+        
+        XCTAssertTrue(result.isNumber)
+        XCTAssertEqual(result.doubleValue, 3)
     }
     
     func testClass() {
         
         let context = JSContext()
         
-        do {
+        let myClass = JSObject(newFunctionIn: context) { context, this, arguments in
             
-            let myClass = JSObject(newFunctionIn: context) { context, this, arguments in
-                
-                let result = arguments[0].doubleValue! + arguments[1].doubleValue!
-                
-                let object = JSObject(newObjectIn: context)
-                object["result"] = JSObject(double: result, in: context)
-                
-                return object
-            }
+            let result = arguments[0].doubleValue! + arguments[1].doubleValue!
             
-            XCTAssertTrue(myClass.isConstructor)
+            let object = JSObject(newObjectIn: context)
+            object["result"] = JSObject(double: result, in: context)
             
-            context.global["myClass"] = myClass
-            
-            let result = try context.evaluateScript("new myClass(1, 2)")
-            
-            XCTAssertTrue(result.isObject)
-            XCTAssertEqual(result["result"].doubleValue, 3)
-            
-            XCTAssertTrue(result.isInstance(of: myClass))
-            
-        } catch let error {
-            
-            XCTFail("\((error as? JSObject)?["message"] ?? error)")
+            return object
         }
+        
+        XCTAssertTrue(myClass.isConstructor)
+        
+        context.global["myClass"] = myClass
+        
+        let result = context.evaluateScript("new myClass(1, 2)")
+        XCTAssertNil(context.exception, "\(context.exception!)")
+        
+        XCTAssertTrue(result.isObject)
+        XCTAssertEqual(result["result"].doubleValue, 3)
+        
+        XCTAssertTrue(result.isInstance(of: myClass))
     }
     
     func testGetter() {
         
         let context = JSContext()
         
-        do {
-            
-            context.global["obj"] = JSObject(newObjectIn: context)
-            
-            let desc = JSPropertyDescriptor(
-                getter: { this in JSObject(double: 3, in: this.context) }
-            )
-            
-            context.global["obj"].defineProperty("three", desc)
-            
-            let result = try context.evaluateScript("obj.three")
-            
-            XCTAssertEqual(result.doubleValue, 3)
-            
-        } catch let error {
-            
-            XCTFail("\((error as? JSObject)?["message"] ?? error)")
-        }
+        context.global["obj"] = JSObject(newObjectIn: context)
+        
+        let desc = JSPropertyDescriptor(
+            getter: { this in JSObject(double: 3, in: this.context) }
+        )
+        
+        context.global["obj"].defineProperty("three", desc)
+        
+        let result = context.evaluateScript("obj.three")
+        XCTAssertNil(context.exception, "\(context.exception!)")
+        
+        XCTAssertEqual(result.doubleValue, 3)
     }
     
     func testSetter() {
         
         let context = JSContext()
         
-        do {
-            
-            context.global["obj"] = JSObject(newObjectIn: context)
-            
-            let desc = JSPropertyDescriptor(
-                getter: { this in this["number_container"] },
-                setter: { this, newValue in this["number_container"] = newValue }
-            )
-            
-            context.global["obj"].defineProperty("number", desc)
-            
-            try context.evaluateScript("obj.number = 5")
-            
-            XCTAssertEqual(context.global["obj"]["number"].doubleValue, 5)
-            XCTAssertEqual(context.global["obj"]["number_container"].doubleValue, 5)
-            
-            try context.evaluateScript("obj.number = 3")
-            
-            XCTAssertEqual(context.global["obj"]["number"].doubleValue, 3)
-            XCTAssertEqual(context.global["obj"]["number_container"].doubleValue, 3)
-            
-        } catch let error {
-            
-            XCTFail("\((error as? JSObject)?["message"] ?? error)")
-        }
+        context.global["obj"] = JSObject(newObjectIn: context)
+        
+        let desc = JSPropertyDescriptor(
+            getter: { this in this["number_container"] },
+            setter: { this, newValue in this["number_container"] = newValue }
+        )
+        
+        context.global["obj"].defineProperty("number", desc)
+        
+        context.evaluateScript("obj.number = 5")
+        XCTAssertNil(context.exception, "\(context.exception!)")
+        
+        XCTAssertEqual(context.global["obj"]["number"].doubleValue, 5)
+        XCTAssertEqual(context.global["obj"]["number_container"].doubleValue, 5)
+        
+        context.evaluateScript("obj.number = 3")
+        XCTAssertNil(context.exception, "\(context.exception!)")
+        
+        XCTAssertEqual(context.global["obj"]["number"].doubleValue, 3)
+        XCTAssertEqual(context.global["obj"]["number_container"].doubleValue, 3)
     }
     
 }

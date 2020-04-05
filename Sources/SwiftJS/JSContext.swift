@@ -39,6 +39,8 @@ public class JSContext {
     
     let context: JSGlobalContextRef
     
+    public private(set) var exception: JSObject?
+    
     public convenience init() {
         self.init(virtualMachine: JSVirtualMachine())
     }
@@ -56,8 +58,25 @@ public class JSContext {
 
 extension JSContext {
     
+    var _exception: JSObjectRef? {
+        get {
+            exception = nil
+            return nil
+        }
+        set {
+            exception = newValue.map { JSObject(context: self, object: $0) }
+        }
+    }
+}
+
+extension JSContext {
+    
     public var global: JSObject {
         return JSObject(context: self, object: JSContextGetGlobalObject(context))
+    }
+    
+    public func garbageCollect() {
+        JSGarbageCollect(context)
     }
 }
 
@@ -88,7 +107,7 @@ extension JSContext {
 
 extension JSContext {
     
-    public func checkScriptSyntax(_ script: String, sourceURL: URL? = nil, startingLineNumber: Int = 0) throws -> Bool {
+    public func checkScriptSyntax(_ script: String, sourceURL: URL? = nil, startingLineNumber: Int = 0) -> Bool {
         
         let script = script.withCString(JSStringCreateWithUTF8CString)
         defer { JSStringRelease(script) }
@@ -96,16 +115,11 @@ extension JSContext {
         let sourceURL = sourceURL?.absoluteString.withCString(JSStringCreateWithUTF8CString)
         defer { sourceURL.map(JSStringRelease) }
         
-        var exception: JSObjectRef?
-        
-        let result = JSCheckScriptSyntax(context, script, sourceURL, Int32(startingLineNumber), &exception)
-        
-        if let exception = exception { throw JSObject(context: self, object: exception) }
-        
-        return result
+        return JSCheckScriptSyntax(context, script, sourceURL, Int32(startingLineNumber), &_exception)
     }
     
-    @discardableResult public func evaluateScript(_ script: String, thisObject: JSObjectRef? = nil, sourceURL: URL? = nil, startingLineNumber: Int = 0) throws -> JSObject {
+    @discardableResult
+    public func evaluateScript(_ script: String, thisObject: JSObjectRef? = nil, sourceURL: URL? = nil, startingLineNumber: Int = 0) -> JSObject {
         
         let script = script.withCString(JSStringCreateWithUTF8CString)
         defer { JSStringRelease(script) }
@@ -113,17 +127,8 @@ extension JSContext {
         let sourceURL = sourceURL?.absoluteString.withCString(JSStringCreateWithUTF8CString)
         defer { sourceURL.map(JSStringRelease) }
         
-        var exception: JSObjectRef?
+        let result = JSEvaluateScript(context, script, thisObject, sourceURL, Int32(startingLineNumber), &_exception)
         
-        let result = JSEvaluateScript(context, script, thisObject, sourceURL, Int32(startingLineNumber), &exception)
-        
-        if let exception = exception { throw JSObject(context: self, object: exception) }
-        
-        return JSObject(context: self, object: result!)
+        return result.map { JSObject(context: self, object: $0) } ?? JSObject(undefinedIn: self)
     }
-    
-    public func garbageCollect() {
-        JSGarbageCollect(context)
-    }
-    
 }

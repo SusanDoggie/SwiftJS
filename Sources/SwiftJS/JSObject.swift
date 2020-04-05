@@ -74,45 +74,39 @@ extension JSObject {
         self.init(context: context, object: JSValueMakeString(context.context, value))
     }
     
-    public convenience init(newRegularExpressionFromPattern pattern: String, flags: String, in context: JSContext) throws {
-        
+    public convenience init(newRegularExpressionFromPattern pattern: String, flags: String, in context: JSContext) {
         let arguments = [JSObject(string: pattern, in: context), JSObject(string: flags, in: context)]
-        
-        var exception: JSObjectRef?
-        
-        let object = JSObjectMakeRegExp(context.context, 2, arguments.map { $0.object }, &exception)
-        
-        if let exception = exception { throw JSObject(context: context, object: exception) }
-        
+        let object = JSObjectMakeRegExp(context.context, 2, arguments.map { $0.object }, &context._exception)
         self.init(context: context, object: object!)
     }
     
-    public convenience init(newErrorFromMessage message: String, in context: JSContext) {
-        let arguments = [JSObject(string: message, in: context)]
-        self.init(context: context, object: JSObjectMakeError(context.context, 1, arguments.map { $0.object }, nil))
+    public convenience init(newErrorFromMessage message: String, in context: JSContext) {let arguments = [JSObject(string: message, in: context)]
+        self.init(context: context, object: JSObjectMakeError(context.context, 1, arguments.map { $0.object }, &context._exception))
     }
     
     public convenience init(newObjectIn context: JSContext) {
         self.init(context: context, object: JSObjectMake(context.context, nil, nil))
     }
     
+    public convenience init(newObjectIn context: JSContext, prototype: JSObject) {
+        let obj = context.global["Object"].invokeMethod("create", withArguments: [prototype])
+        self.init(context: context, object: obj.object)
+    }
+    
     public convenience init(newArrayIn context: JSContext) {
-        self.init(context: context, object: JSObjectMakeArray(context.context, 0, nil, nil))
+        self.init(context: context, object: JSObjectMakeArray(context.context, 0, nil, &context._exception))
     }
 }
 
 extension JSObject: CustomStringConvertible {
     
     public var description: String {
-        
         if self.isUndefined { return "undefined" }
         if self.isNull { return "null" }
         if self.isBoolean { return "\(self.boolValue)" }
         if self.isNumber { return "\(self.doubleValue!)" }
         if self.isString { return "\"\(self.stringValue!.unicodeScalars.reduce(into: "") { $0 += $1.escaped(asASCII: false) })\"" }
-        
-        let description = try? self.invokeMethod("toString", withArguments: [])
-        return description?.stringValue ?? "unknown"
+        return self.invokeMethod("toString", withArguments: []).stringValue!
     }
 }
 
@@ -125,7 +119,7 @@ extension JSObject {
     public var prototype: JSObject {
         get {
             let prototype = JSObjectGetPrototype(context.context, object)
-            return JSObject(context: context, object: prototype!)
+            return prototype.map { JSObject(context: context, object: $0) } ?? JSObject(undefinedIn: context)
         }
         set {
             JSObjectSetPrototype(context.context, object, newValue.object)
@@ -161,7 +155,7 @@ extension JSObject {
     
     public var isArray: Bool {
         guard self.isObject else { return false }
-        guard let result = try? context.global["Array"].invokeMethod("isArray", withArguments: [self]) else { return false }
+        let result = context.global["Array"].invokeMethod("isArray", withArguments: [self])
         return JSValueToBoolean(context.context, result.object)
     }
     
@@ -173,6 +167,37 @@ extension JSObject {
         return JSObjectIsFunction(context.context, object)
     }
     
+    public var isError: Bool {
+        guard self.isObject else { return false }
+        return self.isInstance(of: context.global["Error"])
+    }
+}
+
+extension JSObject {
+    
+    public var isFrozen: Bool {
+        return context.global["Object"].invokeMethod("isFrozen", withArguments: [self]).boolValue
+    }
+    
+    public var isExtensible: Bool {
+        return context.global["Object"].invokeMethod("isExtensible", withArguments: [self]).boolValue
+    }
+    
+    public var isSealed: Bool {
+        return context.global["Object"].invokeMethod("isSealed", withArguments: [self]).boolValue
+    }
+    
+    public func freeze() {
+        context.global["Object"].invokeMethod("freeze", withArguments: [self])
+    }
+    
+    public func preventExtensions() {
+        context.global["Object"].invokeMethod("preventExtensions", withArguments: [self])
+    }
+    
+    public func seal() {
+        context.global["Object"].invokeMethod("seal", withArguments: [self])
+    }
 }
 
 extension JSObject {
@@ -206,40 +231,20 @@ extension JSObject {
 extension JSObject {
     
     @discardableResult
-    public func call(withArguments arguments: [JSObject]) throws -> JSObject {
-        
-        var exception: JSObjectRef?
-        
-        let result = JSObjectCallAsFunction(context.context, object, nil, arguments.count, arguments.isEmpty ? nil : arguments.map { $0.object }, &exception)
-        
-        if let exception = exception { throw JSObject(context: context, object: exception) }
-        
-        return JSObject(context: context, object: result!)
+    public func call(withArguments arguments: [JSObject]) -> JSObject {
+        let result = JSObjectCallAsFunction(context.context, object, nil, arguments.count, arguments.isEmpty ? nil : arguments.map { $0.object }, &context._exception)
+        return result.map { JSObject(context: context, object: $0) } ?? JSObject(undefinedIn: context)
     }
     
-    public func construct(withArguments arguments: [JSObject]) throws -> JSObject {
-        
-        var exception: JSObjectRef?
-        
-        let result = JSObjectCallAsConstructor(context.context, object, arguments.count, arguments.isEmpty ? nil : arguments.map { $0.object }, &exception)
-        
-        if let exception = exception { throw JSObject(context: context, object: exception) }
-        
-        return JSObject(context: context, object: result!)
+    public func construct(withArguments arguments: [JSObject]) -> JSObject {
+        let result = JSObjectCallAsConstructor(context.context, object, arguments.count, arguments.isEmpty ? nil : arguments.map { $0.object }, &context._exception)
+        return result.map { JSObject(context: context, object: $0) } ?? JSObject(undefinedIn: context)
     }
     
     @discardableResult
-    public func invokeMethod(_ name: String, withArguments arguments: [JSObject]) throws -> JSObject {
-        
-        let method = self[name]
-        
-        var exception: JSObjectRef?
-        
-        let result = JSObjectCallAsFunction(context.context, method.object, object, arguments.count, arguments.isEmpty ? nil : arguments.map { $0.object }, &exception)
-        
-        if let exception = exception { throw JSObject(context: context, object: exception) }
-        
-        return JSObject(context: context, object: result!)
+    public func invokeMethod(_ name: String, withArguments arguments: [JSObject]) -> JSObject {
+        let result = JSObjectCallAsFunction(context.context, self[name].object, object, arguments.count, arguments.isEmpty ? nil : arguments.map { $0.object }, &context._exception)
+        return result.map { JSObject(context: context, object: $0) } ?? JSObject(undefinedIn: context)
     }
 }
 
@@ -255,15 +260,13 @@ extension JSObject {
     /// Tests whether two JavaScript values are equal, as compared by the JS `==` operator.
     /// - Parameter other: The other value to be compare.
     /// - Returns: true if the two values are equal; false if they are not equal or an exception is thrown.
-    public func isEqualWithTypeCoercion(to other: JSObject) -> Bool {
-        return JSValueIsEqual(context.context, object, other.object, nil)
+    public func isEqualWithTypeCoercion(to other: JSObject) -> Bool {return JSValueIsEqual(context.context, object, other.object, &context._exception)
     }
     
     /// Tests whether a JavaScript value is an object constructed by a given constructor, as compared by the `isInstance(of:)` operator.
     /// - Parameter other: The constructor to test against.
     /// - Returns: true if the value is an object constructed by constructor, as compared by the JS isInstance(of:) operator; otherwise false.
-    public func isInstance(of other: JSObject) -> Bool {
-        return JSValueIsInstanceOfConstructor(context.context, object, other.object, nil)
+    public func isInstance(of other: JSObject) -> Bool {return JSValueIsInstanceOfConstructor(context.context, object, other.object, &context._exception)
     }
 }
 
@@ -295,23 +298,22 @@ extension JSObject {
     /// - Parameter property: The property's name.
     /// - Returns: true if the delete operation succeeds, otherwise false.
     @discardableResult
-    public func removeProperty(_ property: String) -> Bool {
-        let property = property.withCString(JSStringCreateWithUTF8CString)
+    public func removeProperty(_ property: String) -> Bool {let property = property.withCString(JSStringCreateWithUTF8CString)
         defer { JSStringRelease(property) }
-        return JSObjectDeleteProperty(context.context, object, property, nil)
+        return JSObjectDeleteProperty(context.context, object, property, &context._exception)
     }
     
     public subscript(property: String) -> JSObject {
         get {
             let property = JSStringCreateWithUTF8CString(property)
             defer { JSStringRelease(property) }
-            let result = JSObjectGetProperty(context.context, object, property, nil)
-            return JSObject(context: context, object: result!)
+            let result = JSObjectGetProperty(context.context, object, property, &context._exception)
+            return result.map { JSObject(context: context, object: $0) } ?? JSObject(undefinedIn: context)
         }
         set {
             let property = JSStringCreateWithUTF8CString(property)
             defer { JSStringRelease(property) }
-            JSObjectSetProperty(context.context, object, property, newValue.object, 0, nil)
+            JSObjectSetProperty(context.context, object, property, newValue.object, 0, &context._exception)
         }
     }
 }
@@ -325,11 +327,11 @@ extension JSObject {
     
     public subscript(index: Int) -> JSObject {
         get {
-            let result = JSObjectGetPropertyAtIndex(context.context, object, UInt32(index), nil)
-            return JSObject(context: context, object: result!)
+            let result = JSObjectGetPropertyAtIndex(context.context, object, UInt32(index), &context._exception)
+            return result.map { JSObject(context: context, object: $0) } ?? JSObject(undefinedIn: context)
         }
         set {
-            JSObjectSetPropertyAtIndex(context.context, object, UInt32(index), newValue.object, nil)
+            JSObjectSetPropertyAtIndex(context.context, object, UInt32(index), newValue.object, &context._exception)
         }
     }
 }

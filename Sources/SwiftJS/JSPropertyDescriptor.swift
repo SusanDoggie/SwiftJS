@@ -92,7 +92,9 @@ extension JSObject {
     /// - Parameters:
     ///   - property: The property's name.
     ///   - descriptor: The descriptor object.
-    public func defineProperty(_ property: String, _ descriptor: JSPropertyDescriptor) {
+    /// - Returns: true if the operation succeeds, otherwise false.
+    @discardableResult
+    public func defineProperty(_ property: String, _ descriptor: JSPropertyDescriptor) -> Bool {
         
         let desc = JSObject(newObjectIn: context)
         
@@ -110,6 +112,12 @@ extension JSObject {
         if let configurable = descriptor.configurable { desc["configurable"] = JSObject(bool: configurable, in: context) }
         if let enumerable = descriptor.enumerable { desc["enumerable"] = JSObject(bool: enumerable, in: context) }
         
-        _ = try? context.global["Object"].invokeMethod("defineProperty", withArguments: [self, JSObject(string: property, in: context), desc])
+        context.global["Object"].invokeMethod("defineProperty", withArguments: [self, JSObject(string: property, in: context), desc])
+        
+        return context.exception == nil
+    }
+    
+    public func propertyDescriptor(_ property: String) -> JSObject {
+        return context.global["Object"].invokeMethod("getOwnPropertyDescriptor", withArguments: [self, JSObject(string: property, in: context)])
     }
 }
