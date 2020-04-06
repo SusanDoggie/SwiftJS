@@ -72,10 +72,7 @@ extension JSObject {
     ///   - bytes: A buffer to copy.
     ///   - context: The execution context to use.
     @available(macOS 10.12, iOS 10.0, tvOS 10.0, *)
-    public convenience init<S: DataProtocol>(
-        newArrayBufferWithBytes bytes: S,
-        in context: JSContext
-    ) {
+    public convenience init<S: DataProtocol>(newArrayBufferWithBytes bytes: S, in context: JSContext) {
         
         let buffer: UnsafeMutableRawPointer = .allocate(byteCount: bytes.count, alignment: MemoryLayout<UInt8>.alignment)
         bytes.copyBytes(to: UnsafeMutableRawBufferPointer(start: buffer, count: bytes.count))
@@ -91,11 +88,9 @@ extension JSObject {
         return self.isInstance(of: context.global["ArrayBuffer"])
     }
     
-    /// The length of the `ArrayBuffer`.
-    @available(macOS 10.12, iOS 10.0, tvOS 10.0, *)
+    /// The length (in bytes) of the `ArrayBuffer`.
     public var byteLength: Int {
-        guard self.isArrayBuffer else { return 0 }
-        return JSObjectGetArrayBufferByteLength(context.context, object, &context._exception)
+        return Int(self["byteLength"].doubleValue ?? 0)
     }
     
     /// Copy the bytes of `ArrayBuffer`.
