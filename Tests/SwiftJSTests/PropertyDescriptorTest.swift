@@ -1,5 +1,5 @@
 //
-//  SwiftJSTest.swift
+//  PropertyDescriptorTest.swift
 //
 //  The MIT License
 //  Copyright (c) 2015 - 2020 Susan Cheng. All rights reserved.
@@ -26,34 +26,50 @@
 import SwiftJS
 import XCTest
 
-class SwiftJSTest: XCTestCase {
+class PropertyDescriptorTest: XCTestCase {
     
-    func testCalculation() {
+    func testGetter() {
         
         let context = JSContext()
         
-        let result = context.evaluateScript("1 + 1")
+        context.global["obj"] = JSObject(newObjectIn: context)
+        
+        let desc = JSPropertyDescriptor(
+            getter: { this in JSObject(double: 3, in: this.context) }
+        )
+        
+        context.global["obj"].defineProperty("three", desc)
+        
+        let result = context.evaluateScript("obj.three")
         XCTAssertNil(context.exception, "\(context.exception!)")
         
-        XCTAssertTrue(result.isNumber)
-        XCTAssertEqual(result.doubleValue, 2)
+        XCTAssertEqual(result.doubleValue, 3)
     }
     
-    func testArray() {
+    func testSetter() {
         
         let context = JSContext()
         
-        let result = context.evaluateScript("[1 + 2, \"BMW\", \"Volvo\"]")
+        context.global["obj"] = JSObject(newObjectIn: context)
+        
+        let desc = JSPropertyDescriptor(
+            getter: { this in this["number_container"] },
+            setter: { this, newValue in this["number_container"] = newValue }
+        )
+        
+        context.global["obj"].defineProperty("number", desc)
+        
+        context.evaluateScript("obj.number = 5")
         XCTAssertNil(context.exception, "\(context.exception!)")
         
-        XCTAssertTrue(result.isArray)
+        XCTAssertEqual(context.global["obj"]["number"].doubleValue, 5)
+        XCTAssertEqual(context.global["obj"]["number_container"].doubleValue, 5)
         
-        let length = result["length"]
-        XCTAssertEqual(length.doubleValue, 3)
+        context.evaluateScript("obj.number = 3")
+        XCTAssertNil(context.exception, "\(context.exception!)")
         
-        XCTAssertEqual(result[0].doubleValue, 3)
-        XCTAssertEqual(result[1].stringValue, "BMW")
-        XCTAssertEqual(result[2].stringValue, "Volvo")
+        XCTAssertEqual(context.global["obj"]["number"].doubleValue, 3)
+        XCTAssertEqual(context.global["obj"]["number_container"].doubleValue, 3)
     }
     
 }

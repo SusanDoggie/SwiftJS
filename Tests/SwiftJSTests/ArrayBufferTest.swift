@@ -1,5 +1,5 @@
 //
-//  SwiftJSTest.swift
+//  ArrayBufferTest.swift
 //
 //  The MIT License
 //  Copyright (c) 2015 - 2020 Susan Cheng. All rights reserved.
@@ -26,34 +26,43 @@
 import SwiftJS
 import XCTest
 
-class SwiftJSTest: XCTestCase {
+@available(macOS 10.12, iOS 10.0, tvOS 10.0, *)
+class ArrayBufferTest: XCTestCase {
     
-    func testCalculation() {
+    func testArrayBuffer() {
         
         let context = JSContext()
         
-        let result = context.evaluateScript("1 + 1")
-        XCTAssertNil(context.exception, "\(context.exception!)")
+        let bytes: [UInt8] = [1, 2, 3, 4, 5, 6, 7, 8]
+        context.global["buffer"] = JSObject(newArrayBufferWithBytes: bytes, in: context)
         
-        XCTAssertTrue(result.isNumber)
-        XCTAssertEqual(result.doubleValue, 2)
+        XCTAssertTrue(context.global["buffer"].isArrayBuffer)
+        XCTAssertEqual(context.global["buffer"].byteLength, 8)
+        
     }
     
-    func testArray() {
+    func testDataView() {
         
         let context = JSContext()
         
-        let result = context.evaluateScript("[1 + 2, \"BMW\", \"Volvo\"]")
-        XCTAssertNil(context.exception, "\(context.exception!)")
+        let bytes: [UInt8] = [1, 2, 3, 4, 5, 6, 7, 8]
+        context.global["buffer"] = JSObject(newArrayBufferWithBytes: bytes, in: context)
         
-        XCTAssertTrue(result.isArray)
+        context.evaluateScript("new DataView(buffer).setUint8(0, 5)")
         
-        let length = result["length"]
-        XCTAssertEqual(length.doubleValue, 3)
+        XCTAssertEqual(context["buffer"].copyBytes().map(Array.init), [5, 2, 3, 4, 5, 6, 7, 8])
         
-        XCTAssertEqual(result[0].doubleValue, 3)
-        XCTAssertEqual(result[1].stringValue, "BMW")
-        XCTAssertEqual(result[2].stringValue, "Volvo")
+    }
+    
+    func testSlice() {
+        
+        let context = JSContext()
+        
+        let bytes: [UInt8] = [1, 2, 3, 4, 5, 6, 7, 8]
+        context.global["buffer"] = JSObject(newArrayBufferWithBytes: bytes, in: context)
+        
+        XCTAssertEqual(context.evaluateScript("buffer.slice(2, 4)").copyBytes().map(Array.init), [3, 4])
+        
     }
     
 }
