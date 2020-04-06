@@ -38,6 +38,16 @@ extension JSObject {
     /// Creates a JavaScript `ArrayBuffer` object.
     ///
     /// - Parameters:
+    ///   - length: Length of new `ArrayBuffer` object.
+    ///   - context: The execution context to use.
+    public convenience init(newArrayBufferWithLength length: Int, in context: JSContext) {
+        let obj = context.global["ArrayBuffer"].construct(withArguments: [JSObject(double: Double(length), in: context)])
+        self.init(context: context, object: obj.object)
+    }
+    
+    /// Creates a JavaScript `ArrayBuffer` object.
+    ///
+    /// - Parameters:
     ///   - bytes: A buffer to be used as the backing store of the `ArrayBuffer` object.
     ///   - deallocator: The allocator to use to deallocate the external buffer when the `ArrayBuffer` object is deallocated.
     ///   - context: The execution context to use.
