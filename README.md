@@ -10,17 +10,6 @@
 
 A cross platform Javascript engine for Swift.
 
-## Build Status
-
-| | **Build Tool** | **Master** |
-|---|:---:|:---:|
-| **macOS**        | **Xcode** | [![Build Status](https://travis-matrix-badges.herokuapp.com/repos/SusanDoggie/SwiftJS/branches/master/1?use_travis_com=true)](https://travis-ci.com/SusanDoggie/SwiftJS)|
-| **iOS**        | **Xcode** | [![Build Status](https://travis-matrix-badges.herokuapp.com/repos/SusanDoggie/SwiftJS/branches/master/2?use_travis_com=true)](https://travis-ci.com/SusanDoggie/SwiftJS)|
-| **tvOS**        | **Xcode** | [![Build Status](https://travis-matrix-badges.herokuapp.com/repos/SusanDoggie/SwiftJS/branches/master/3?use_travis_com=true)](https://travis-ci.com/SusanDoggie/SwiftJS)|
-| **macOS**        | **SwiftPM** | [![Build Status](https://travis-matrix-badges.herokuapp.com/repos/SusanDoggie/SwiftJS/branches/master/4?use_travis_com=true)](https://travis-ci.com/SusanDoggie/SwiftJS)|
-| **Ubuntu 16.04** | **SwiftPM** | [![Build Status](https://travis-matrix-badges.herokuapp.com/repos/SusanDoggie/SwiftJS/branches/master/5?use_travis_com=true)](https://travis-ci.com/SusanDoggie/SwiftJS)|
-| **Ubuntu 18.04** | **SwiftPM** | [![Build Status](https://travis-matrix-badges.herokuapp.com/repos/SusanDoggie/SwiftJS/branches/master/6?use_travis_com=true)](https://travis-ci.com/SusanDoggie/SwiftJS)|
-
 ## System Requirements
 
 ### Ubuntu
