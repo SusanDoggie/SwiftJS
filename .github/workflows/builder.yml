@@ -41,7 +41,7 @@ jobs:
           xcodebuild ${XCODEBUILD_CONFIG} -scheme ${SCHEME} -destination "${DESTINATION}" test-without-building -skipUnavailableActions | xcpretty -f `xcpretty-travis-formatter`
         done
     - uses: codecov/codecov-action@v1
-      if: ${{ codeov_eligible }}
+      if: ${{ matrix.codeov_eligible }}
   macos:
     name: macOS(SwiftPM)
     runs-on: macOS-latest
