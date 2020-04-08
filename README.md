@@ -1,7 +1,6 @@
 # SwiftJS
 
 [![Github Actions](https://github.com/SusanDoggie/SwiftJS/workflows/Builder/badge.svg)](https://github.com/SusanDoggie/SwiftJS/actions)
-[![Build Status](https://travis-ci.com/SusanDoggie/SwiftJS.svg?branch=master)](https://travis-ci.com/SusanDoggie/SwiftJS)
 [![codecov](https://codecov.io/gh/SusanDoggie/SwiftJS/branch/master/graph/badge.svg)](https://codecov.io/gh/SusanDoggie/SwiftJS)
 ![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20iOS%20%7C%20Linux-lightgrey.svg?style=flat)
 [![GitHub release](https://img.shields.io/github/release/SusanDoggie/SwiftJS.svg)](https://github.com/SusanDoggie/SwiftJS/releases)
