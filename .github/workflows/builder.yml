@@ -18,7 +18,7 @@ jobs:
             destination: 'platform=tvOS Simulator,name=Apple TV 4K'
     env:
       USE_XCOEBUILD: true
-      ENABLE_CODECOV: true
+      ENABLE_CODECOV: ${{ matrix.enable_codecov }}
       DESTINATION: ${{ matrix.destination }}
       XCODEBUILD_CONFIG: "-configuration Release -sdk ${{ matrix.sdk }}"
     steps:
