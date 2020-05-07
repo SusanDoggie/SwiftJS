@@ -124,12 +124,17 @@ jobs:
     strategy:
       matrix:
         image: [nightly-centos8, nightly-amazonlinux2]
+        include:
+          - image: nightly-centos8
+            jsc: webkit2gtk3-jsc-devel
+          - image: nightly-amazonlinux2
+            jsc: webkitgtk4-jsc-devel
     steps:
     - uses: actions/checkout@v1
       with:
         submodules: recursive
     - name: Install dependencies
-      run: yum update && yum -y install webkit2gtk3-jsc-devel
+      run: yum update && yum -y install ${{ matrix.jsc }}
     - name: Build
       uses: SusanDoggie/swift-action@master
       with:
