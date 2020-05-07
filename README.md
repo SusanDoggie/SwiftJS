@@ -17,9 +17,13 @@ For Linux platforms, you need to install JavaScriptCore
 
     apt-get -y install libjavascriptcoregtk-4.0-dev
 
-### CentOS
+### CentOS 8
 
     yum -y install webkit2gtk3-jsc-devel
+
+### Amazon Linux 2
+
+    yum -y install webkitgtk4-jsc-devel
 
 ## Contributing
 
