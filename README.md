@@ -11,11 +11,15 @@ A cross platform Javascript engine for Swift.
 
 ## System Requirements
 
+For Linux platforms, you need to install JavaScriptCore
+
 ### Ubuntu
 
-For Ubuntu, you need to install JavaScriptCore
-
     apt-get -y install libjavascriptcoregtk-4.0-dev
+
+### CentOS
+
+    yum -y install webkit2gtk3-jsc-devel
 
 ## Contributing
 
