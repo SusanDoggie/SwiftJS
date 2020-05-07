@@ -129,7 +129,7 @@ jobs:
       with:
         submodules: recursive
     - name: Install dependencies
-      run: yum update && yum -y install libjavascriptcoregtk4-devel
+      run: yum update && yum -y install libjavascriptcoregtk-4.0-dev
     - name: Build
       uses: SusanDoggie/swift-action@master
       with:
