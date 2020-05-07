@@ -65,7 +65,7 @@ jobs:
       with:
         submodules: recursive
     - name: Install dependencies
-      run: apt-get update && apt-get -y install libjavascriptcoregtk-4.0-dev
+      run: apt-get -y install libjavascriptcoregtk-4.0-dev
     - name: Build
       uses: SusanDoggie/swift-action@master
       with:
@@ -87,7 +87,7 @@ jobs:
       with:
         submodules: recursive
     - name: Install dependencies
-      run: apt-get update && apt-get -y install libjavascriptcoregtk-4.0-dev
+      run: apt-get -y install libjavascriptcoregtk-4.0-dev
     - name: Build
       uses: SusanDoggie/swift-action@master
       with:
@@ -106,7 +106,7 @@ jobs:
       with:
         submodules: recursive
     - name: Install dependencies
-      run: apt-get update && apt-get -y install libjavascriptcoregtk-4.0-dev
+      run: apt-get -y install libjavascriptcoregtk-4.0-dev
     - name: Build
       uses: SusanDoggie/swift-action@master
       with:
@@ -129,7 +129,7 @@ jobs:
       with:
         submodules: recursive
     - name: Install dependencies
-      run: yum update && yum -y install libjavascriptcoregtk-4.0-dev
+      run: yum -y install libjavascriptcoregtk-4.0-dev
     - name: Build
       uses: SusanDoggie/swift-action@master
       with:
