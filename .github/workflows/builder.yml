@@ -65,7 +65,7 @@ jobs:
       with:
         submodules: recursive
     - name: Install dependencies
-      run: apt-get update && apt-get -y install libjavascriptcoregtk-4.0-dev
+      run: apt-get update && apt-get install -y libjavascriptcoregtk-4.0-dev
     - name: Build
       uses: SusanDoggie/swift-action@master
       with:
