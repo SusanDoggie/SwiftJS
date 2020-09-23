@@ -81,10 +81,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        image: [centos7, centos8, amazonlinux2]
+        image: [centos8, amazonlinux2]
         include:
-          - image: centos7
-            jsc: webkit2gtk3-jsc-devel
           - image: centos8
             jsc: webkit2gtk3-jsc-devel
           - image: amazonlinux2
@@ -152,10 +150,8 @@ jobs:
     continue-on-error: true
     strategy:
       matrix:
-        image: [nightly-centos7, nightly-centos8, nightly-amazonlinux2]
+        image: [nightly-centos8, nightly-amazonlinux2]
         include:
-          - image: nightly-centos7
-            jsc: webkit2gtk3-jsc-devel
           - image: nightly-centos8
             jsc: webkit2gtk3-jsc-devel
           - image: nightly-amazonlinux2
