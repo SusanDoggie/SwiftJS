@@ -372,7 +372,7 @@ extension JSObject {
     ///   - other: The other value to be compare.
     ///   
     /// - Returns: true if the two values are strict equal; otherwise false.
-    public func isEquål(to other: JSObject) -> Bool {
+    public func isEqual(to other: JSObject) -> Bool {
         return JSValueIsStrictEqual(context.context, object, other.object)
     }
     
