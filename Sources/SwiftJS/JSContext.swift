@@ -164,7 +164,7 @@ extension JSContext {
     ///   
     /// - Returns: true if the script is syntactically correct; otherwise false.
     @discardableResult
-    open func evaluateScript(_ script: String, this: JSObjectRef? = nil, sourceURL: URL? = nil, startingLineNumber: Int = 0) -> JSObject {
+    open func evaluateScript(_ script: String, this: JSObject? = nil, sourceURL: URL? = nil, startingLineNumber: Int = 0) -> JSObject {
         
         let script = script.withCString(JSStringCreateWithUTF8CString)
         defer { JSStringRelease(script) }
@@ -172,7 +172,7 @@ extension JSContext {
         let sourceURL = sourceURL?.absoluteString.withCString(JSStringCreateWithUTF8CString)
         defer { sourceURL.map(JSStringRelease) }
         
-        let result = JSEvaluateScript(context, script, this, sourceURL, Int32(startingLineNumber), &_exception)
+        let result = JSEvaluateScript(context, script, this?.object, sourceURL, Int32(startingLineNumber), &_exception)
         
         return result.map { JSObject(context: self, object: $0) } ?? JSObject(undefinedIn: self)
     }
