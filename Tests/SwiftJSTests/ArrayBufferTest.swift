@@ -41,6 +41,32 @@ class ArrayBufferTest: XCTestCase {
         
     }
     
+    func testArrayBufferWithBytesNoCopy() {
+        
+        var flag = 0
+        
+        do {
+            
+            let context = JSContext()
+            
+            var bytes: [UInt8] = [1, 2, 3, 4, 5, 6, 7, 8]
+            
+            bytes.withUnsafeMutableBytes { bytes in
+                
+                context.global["buffer"] = JSObject(
+                    newArrayBufferWithBytesNoCopy: bytes,
+                    deallocator: { _ in flag = 1 },
+                    in: context)
+                
+                XCTAssertTrue(context.global["buffer"].isArrayBuffer)
+                XCTAssertEqual(context.global["buffer"].byteLength, 8)
+            }
+            
+        }
+        
+        XCTAssertEqual(flag, 1)
+    }
+    
     func testDataView() {
         
         let context = JSContext()

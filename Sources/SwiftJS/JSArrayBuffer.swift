@@ -63,7 +63,21 @@ extension JSObject {
         let info: UnsafeMutablePointer<Deallocator> = .allocate(capacity: 1)
         info.initialize(to: { deallocator(bytes) })
         
-        self.init(context: context, object: JSObjectMakeArrayBufferWithBytesNoCopy(context.context, bytes.baseAddress, bytes.count, { _, info in info?.assumingMemoryBound(to: Deallocator.self).deinitialize(count: 1).deallocate() }, info, &context._exception))
+        self.init(
+            context: context,
+            object: JSObjectMakeArrayBufferWithBytesNoCopy(
+                context.context,
+                bytes.baseAddress,
+                bytes.count,
+                { _, info in
+                    guard let info = info?.assumingMemoryBound(to: Deallocator.self) else { return }
+                    info.pointee()
+                    info.deinitialize(count: 1).deallocate()
+                },
+                info,
+                &context._exception
+            )
+        )
     }
     
     /// Creates a JavaScript `ArrayBuffer` object.
