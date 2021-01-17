@@ -28,11 +28,11 @@ jobs:
       with:
         submodules: recursive
     - name: Build
-      uses: SusanDoggie/swift-action@master
+      uses: SusanDoggie/swift-action@main
       with:
         action: build
     - name: Run tests
-      uses: SusanDoggie/swift-action@master
+      uses: SusanDoggie/swift-action@main
       with:
         action: test
     - uses: codecov/codecov-action@v1
@@ -45,11 +45,11 @@ jobs:
       with:
         submodules: recursive
     - name: Build
-      uses: SusanDoggie/swift-action@master
+      uses: SusanDoggie/swift-action@main
       with:
         action: build
     - name: Run tests
-      uses: SusanDoggie/swift-action@master
+      uses: SusanDoggie/swift-action@main
       with:
         action: test
   ubuntu_swift_latest:
@@ -67,11 +67,11 @@ jobs:
     - name: Install dependencies
       run: apt-get update && apt-get install -y libjavascriptcoregtk-4.0-dev
     - name: Build
-      uses: SusanDoggie/swift-action@master
+      uses: SusanDoggie/swift-action@main
       with:
         action: build
     - name: Run tests
-      uses: SusanDoggie/swift-action@master
+      uses: SusanDoggie/swift-action@main
       with:
         action: test
   linux_swift_latest:
@@ -94,11 +94,11 @@ jobs:
     - name: Install dependencies
       run: yum update -y && yum install -y ${{ matrix.jsc }}
     - name: Build
-      uses: SusanDoggie/swift-action@master
+      uses: SusanDoggie/swift-action@main
       with:
         action: build
     - name: Run tests
-      uses: SusanDoggie/swift-action@master
+      uses: SusanDoggie/swift-action@main
       with:
         action: test
   swift_5_1:
@@ -116,7 +116,7 @@ jobs:
     - name: Install dependencies
       run: apt-get update && apt-get install -y libjavascriptcoregtk-4.0-dev
     - name: Build
-      uses: SusanDoggie/swift-action@master
+      uses: SusanDoggie/swift-action@main
       with:
         action: build
   ubuntu_swift_nightly:
@@ -135,11 +135,11 @@ jobs:
     - name: Install dependencies
       run: apt-get update && apt-get install -y libjavascriptcoregtk-4.0-dev
     - name: Build
-      uses: SusanDoggie/swift-action@master
+      uses: SusanDoggie/swift-action@main
       with:
         action: build
     - name: Run tests
-      uses: SusanDoggie/swift-action@master
+      uses: SusanDoggie/swift-action@main
       with:
         action: test
   linux_swift_nightly:
@@ -163,10 +163,10 @@ jobs:
     - name: Install dependencies
       run: yum update -y && yum install -y ${{ matrix.jsc }}
     - name: Build
-      uses: SusanDoggie/swift-action@master
+      uses: SusanDoggie/swift-action@main
       with:
         action: build
     - name: Run tests
-      uses: SusanDoggie/swift-action@master
+      uses: SusanDoggie/swift-action@main
       with:
         action: test
