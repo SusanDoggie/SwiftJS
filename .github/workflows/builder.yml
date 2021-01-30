@@ -1,25 +1,30 @@
 name: Builder
 on: [push, pull_request]
 jobs:
-  darwin:
+  macos:
     name: ${{ matrix.name }}
     runs-on: macOS-latest
     strategy:
       matrix:
-        sdk: [macosx, iphonesimulator, appletvsimulator]
+        name: [macOS, iOS, tvOS, macOS(SwiftPM)]
         include:
           - name: macOS
-            enable_codecov: true
+            use_xcodebuild: true
             sdk: macosx
             destination: 'platform=macOS'
+            enable_codecov: true
           - name: iOS
+            use_xcodebuild: true
             sdk: iphonesimulator
             destination: 'platform=iOS Simulator,name=iPhone 11'
           - name: tvOS
+            use_xcodebuild: true
             sdk: appletvsimulator
             destination: 'platform=tvOS Simulator,name=Apple TV 4K'
+          - name: macOS(SwiftPM)
+            use_xcodebuild: false
     env:
-      use_xcodebuild: true
+      use_xcodebuild: ${{ matrix.use_xcodebuild }}
       sdk: ${{ matrix.sdk }}
       destination: ${{ matrix.destination }}
       enable_codecov: ${{ matrix.enable_codecov }}
@@ -37,21 +42,6 @@ jobs:
         action: test
     - uses: codecov/codecov-action@v1
       if: ${{ matrix.enable_codecov }}
-  macos:
-    name: macOS(SwiftPM)
-    runs-on: macOS-latest
-    steps:
-    - uses: actions/checkout@v1
-      with:
-        submodules: recursive
-    - name: Build
-      uses: SusanDoggie/swift-action@main
-      with:
-        action: build
-    - name: Run tests
-      uses: SusanDoggie/swift-action@main
-      with:
-        action: test
   ubuntu_swift_latest:
     name: latest-${{ matrix.image }}
     container: 
