@@ -1,5 +1,5 @@
 //
-//  module.modulemap
+//  jscore_c.h
 //
 //  The MIT License
 //  Copyright (c) 2015 - 2021 Susan Cheng. All rights reserved.
@@ -23,8 +23,9 @@
 //  THE SOFTWARE.
 //
 
-module CJSCore [system] [extern_c] {
-    umbrella header "jscore_c.h"
-    link "javascriptcoregtk-4.0"
-    export *
-}
+#ifndef jscore_c_h
+#define jscore_c_h
+
+#include <webkitgtk-4.0/JavaScriptCore/JavaScript.h>
+
+#endif /* jscore_c_h */
