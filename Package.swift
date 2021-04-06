@@ -33,7 +33,10 @@ var targets: [Target] = []
 targets.append(
     .target(
         name: "CJSCore",
-        dependencies: []
+        dependencies: [],
+        cSettings: [
+            .headerSearchPath("header_maps"),
+        ]
     )
 )
 targets.append(
@@ -41,9 +44,6 @@ targets.append(
         name: "SwiftJS",
         dependencies: [
             "CJSCore",
-        ],
-        cSettings: [
-            .headerSearchPath("header_maps"),
         ]
     )
 )
