@@ -1,5 +1,5 @@
 //
-//  jscore_c.h
+//  JSContextRef.h
 //
 //  The MIT License
 //  Copyright (c) 2015 - 2021 Susan Cheng. All rights reserved.
@@ -23,7 +23,4 @@
 //  THE SOFTWARE.
 //
 
-#ifndef jscore_c_h
-#define jscore_c_h
-
-#endif /* jscore_c_h */
+#include <webkitgtk-4.0/JavaScriptCore/JSContextRef.h>
