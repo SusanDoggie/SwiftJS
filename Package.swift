@@ -43,7 +43,7 @@ targets.append(
             "CJSCore",
         ],
         cSettings: [
-            .headerSearchPath("header_maps"),
+            .headerSearchPath("../CJSCore/header_maps"),
         ]
     )
 )
