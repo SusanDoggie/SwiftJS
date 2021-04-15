@@ -324,7 +324,8 @@ extension JSObject {
     }
     
     /// Returns the JavaScript object as dictionary.
-    public var dictionary: [String: JSObject] {
+    public var dictionary: [String: JSObject]? {
+        guard self.isObject else { return nil }
         return self.properties.reduce(into: [:]) { $0[$1] = self[$1] }
     }
 }
