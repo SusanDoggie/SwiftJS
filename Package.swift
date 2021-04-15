@@ -41,6 +41,7 @@ targets.append(
         name: "SwiftJS",
         dependencies: [
             "CJSCore",
+            .product(name: "DoggieCore", package: "Doggie"),
         ],
         cSettings: [
             .headerSearchPath("../CJSCore/header_maps"),
@@ -53,7 +54,9 @@ targets.append(
 targets.append(
     .target(
         name: "SwiftJS",
-        dependencies: []
+        dependencies: [
+            .product(name: "DoggieCore", package: "Doggie"),
+        ]
     )
 )
 
@@ -68,8 +71,17 @@ targets.append(
 
 let package = Package(
     name: "SwiftJS",
+    platforms: [
+        .macOS(.v10_12),
+        .iOS(.v10),
+        .tvOS(.v10),
+        .watchOS(.v3),
+    ],
     products: [
         .library(name: "SwiftJS", targets: ["SwiftJS"]),
+    ],
+    dependencies: [
+        .package(url: "https://github.com/SusanDoggie/Doggie.git", from: "6.3.0"),
     ],
     targets: targets
 )

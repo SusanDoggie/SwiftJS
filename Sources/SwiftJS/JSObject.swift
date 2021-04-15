@@ -64,10 +64,14 @@ extension JSObject {
 
 extension JSObject {
     
-    public convenience init(json: String, in context: JSContext) {
-        let json = json.withCString(JSStringCreateWithUTF8CString)
-        defer { JSStringRelease(json) }
-        self.init(context: context, object: JSValueMakeFromJSONString(context.context, json))
+    public convenience init(json: Json, in context: JSContext) {
+        if let json = json.json() {
+            let json = json.withCString(JSStringCreateWithUTF8CString)
+            defer { JSStringRelease(json) }
+            self.init(context: context, object: JSValueMakeFromJSONString(context.context, json))
+        } else {
+            self.init(context: context, object: JSValueMakeNull(context.context))
+        }
     }
 }
 
@@ -340,10 +344,10 @@ extension JSObject {
 
 extension JSObject {
     
-    public func toJson() -> String? {
+    public func toJson() -> Json? {
         let str = JSValueCreateJSONString(context.context, object, 0, nil)
         defer { str.map(JSStringRelease) }
-        return str.map(String.init)
+        return str.map(String.init).flatMap { try? Json(decode: $0) }
     }
 }
 
