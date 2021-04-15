@@ -60,7 +60,15 @@ extension JSObject {
         formatter.timeZone = TimeZone(abbreviation: "UTC")
         return formatter
     }()
+}
+
+extension JSObject {
     
+    public convenience init(json: String, in context: JSContext) {
+        let json = json.withCString(JSStringCreateWithUTF8CString)
+        defer { JSStringRelease(json) }
+        self.init(context: context, object: JSValueMakeFromJSONString(context.context, json))
+    }
 }
 
 extension JSObject {
@@ -327,6 +335,15 @@ extension JSObject {
     public var dictionary: [String: JSObject]? {
         guard self.isObject else { return nil }
         return self.properties.reduce(into: [:]) { $0[$1] = self[$1] }
+    }
+}
+
+extension JSObject {
+    
+    public func toJson() -> String? {
+        let str = JSValueCreateJSONString(context.context, object, 0, nil)
+        defer { str.map(JSStringRelease) }
+        return str.map(String.init)
     }
 }
 
