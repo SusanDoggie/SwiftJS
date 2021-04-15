@@ -175,7 +175,7 @@ extension JSObject: CustomStringConvertible {
     public var description: String {
         if self.isUndefined { return "undefined" }
         if self.isNull { return "null" }
-        if self.isBoolean { return "\(self.boolValue)" }
+        if self.isBoolean { return "\(self.boolValue!)" }
         if self.isNumber { return "\(self.doubleValue!)" }
         if self.isString { return "\"\(self.stringValue!.unicodeScalars.reduce(into: "") { $0 += $1.escaped(asASCII: false) })\"" }
         return self.invokeMethod("toString", withArguments: []).stringValue!
@@ -262,15 +262,15 @@ extension JSObject {
 extension JSObject {
     
     public var isFrozen: Bool {
-        return context.global["Object"].invokeMethod("isFrozen", withArguments: [self]).boolValue
+        return context.global["Object"].invokeMethod("isFrozen", withArguments: [self]).boolValue ?? false
     }
     
     public var isExtensible: Bool {
-        return context.global["Object"].invokeMethod("isExtensible", withArguments: [self]).boolValue
+        return context.global["Object"].invokeMethod("isExtensible", withArguments: [self]).boolValue ?? false
     }
     
     public var isSealed: Bool {
-        return context.global["Object"].invokeMethod("isSealed", withArguments: [self]).boolValue
+        return context.global["Object"].invokeMethod("isSealed", withArguments: [self]).boolValue ?? false
     }
     
     public func freeze() {
@@ -289,12 +289,14 @@ extension JSObject {
 extension JSObject {
     
     /// Returns the JavaScript boolean value.
-    public var boolValue: Bool {
+    public var boolValue: Bool? {
+        guard self.isBoolean else { return nil }
         return JSValueToBoolean(context.context, object)
     }
     
     /// Returns the JavaScript number value.
     public var doubleValue: Double? {
+        guard self.isNumber else { return nil }
         var exception: JSObjectRef?
         let result = JSValueToNumber(context.context, object, &exception)
         return exception == nil ? result : nil
@@ -302,6 +304,7 @@ extension JSObject {
     
     /// Returns the JavaScript string value.
     public var stringValue: String? {
+        guard self.isString else { return nil }
         let str = JSValueToStringCopy(context.context, object, nil)
         defer { str.map(JSStringRelease) }
         return str.map(String.init)
@@ -309,6 +312,7 @@ extension JSObject {
     
     /// Returns the JavaScript date value.
     public var dateValue: Date? {
+        guard self.isDate else { return nil }
         let result = self.invokeMethod("toISOString", withArguments: [])
         return result.stringValue.flatMap { JSObject.rfc3339.date(from: $0) }
     }
