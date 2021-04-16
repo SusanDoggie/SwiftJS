@@ -433,7 +433,6 @@ extension JSObject {
         
         let count = JSPropertyNameArrayGetCount(_list)
         let list = (0..<count).map { JSPropertyNameArrayGetNameAtIndex(_list, $0)! }
-        defer { list.forEach(JSStringRelease) }
         
         return list.map(String.init)
     }
