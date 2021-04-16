@@ -26,6 +26,7 @@ jobs:
             use_xcodebuild: false
     env:
       use_xcodebuild: ${{ matrix.use_xcodebuild }}
+      schemes: SwiftJS
       sdk: ${{ matrix.sdk }}
       destination: ${{ matrix.destination }}
       enable_codecov: ${{ matrix.enable_codecov }}
