@@ -26,6 +26,7 @@ jobs:
             use_xcodebuild: false
     env:
       use_xcodebuild: ${{ matrix.use_xcodebuild }}
+      schemes: SwiftJS
       sdk: ${{ matrix.sdk }}
       destination: ${{ matrix.destination }}
       enable_codecov: ${{ matrix.enable_codecov }}
@@ -94,25 +95,6 @@ jobs:
       uses: SusanDoggie/swift-action@main
       with:
         action: test
-  swift_5_1:
-    name: ${{ matrix.image }}
-    container:
-      image: docker://swift:${{ matrix.image }}
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        image: [5.1-xenial, 5.1-bionic]
-    steps:
-    - uses: actions/checkout@v1
-      with:
-        submodules: recursive
-    - name: Install dependencies
-      run: apt-get update && apt-get install -y libjavascriptcoregtk-4.0-dev
-    - name: Build
-      uses: SusanDoggie/swift-action@main
-      with:
-        action: build
   ubuntu_swift_nightly:
     name: ${{ matrix.image }}
     container:
