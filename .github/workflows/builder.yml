@@ -128,9 +128,9 @@ jobs:
       matrix:
         image: [5.3-centos8, 5.3-amazonlinux2]
         include:
-          - image: centos8
+          - image: 5.3-centos8
             jsc: webkit2gtk3-jsc-devel
-          - image: amazonlinux2
+          - image: 5.3-amazonlinux2
             jsc: webkitgtk4-jsc-devel
     steps:
     - uses: actions/checkout@v1
