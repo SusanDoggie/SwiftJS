@@ -95,6 +95,57 @@ jobs:
       uses: SusanDoggie/swift-action@main
       with:
         action: test
+  ubuntu_swift_5_3:
+    name: ${{ matrix.image }}
+    container: 
+      image: docker://swift:${{ matrix.image }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        image: [5.3-xenial, 5.3-bionic, 5.3-focal]
+    steps:
+    - uses: actions/checkout@v1
+      with:
+        submodules: recursive
+    - name: Install dependencies
+      run: apt-get update && apt-get install -y libjavascriptcoregtk-4.0-dev
+    - name: Build
+      uses: SusanDoggie/swift-action@main
+      with:
+        action: build
+    - name: Run tests
+      uses: SusanDoggie/swift-action@main
+      with:
+        action: test
+  linux_swift_5_3:
+    name: ${{ matrix.image }}
+    container: 
+      image: docker://swift:${{ matrix.image }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        image: [5.3-centos8, 5.3-amazonlinux2]
+        include:
+          - image: centos8
+            jsc: webkit2gtk3-jsc-devel
+          - image: amazonlinux2
+            jsc: webkitgtk4-jsc-devel
+    steps:
+    - uses: actions/checkout@v1
+      with:
+        submodules: recursive
+    - name: Install dependencies
+      run: yum update -y && yum install -y ${{ matrix.jsc }}
+    - name: Build
+      uses: SusanDoggie/swift-action@main
+      with:
+        action: build
+    - name: Run tests
+      uses: SusanDoggie/swift-action@main
+      with:
+        action: test
   ubuntu_swift_nightly:
     name: ${{ matrix.image }}
     container:
