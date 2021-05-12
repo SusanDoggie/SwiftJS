@@ -79,7 +79,11 @@ jobs:
         include:
           - image: 5.3-centos8
             jsc: webkit2gtk3-jsc-devel
+          - image: 5.4-centos8
+            jsc: webkit2gtk3-jsc-devel
           - image: 5.3-amazonlinux2
+            jsc: webkitgtk4-jsc-devel
+          - image: 5.4-amazonlinux2
             jsc: webkitgtk4-jsc-devel
     steps:
     - uses: actions/checkout@v1
