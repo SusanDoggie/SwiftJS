@@ -81,7 +81,7 @@ let package = Package(
         .library(name: "SwiftJS", targets: ["SwiftJS"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/SusanDoggie/Doggie.git", from: "6.3.0"),
+        .package(url: "https://github.com/SusanDoggie/Doggie.git", from: "6.4.0"),
     ],
     targets: targets
 )
