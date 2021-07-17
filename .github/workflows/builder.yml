@@ -81,6 +81,7 @@ jobs:
         include:
           - distro: centos8
             jsc: webkit2gtk3-jsc-devel
+            allowerasing: --allowerasing
           - distro: amazonlinux2
             jsc: webkitgtk4-jsc-devel
     steps:
@@ -88,7 +89,7 @@ jobs:
       with:
         submodules: recursive
     - name: Install dependencies
-      run: yum update -y --allowerasing && yum install -y ${{ matrix.jsc }}
+      run: yum update -y ${{ matrix.allowerasing }} && yum install -y ${{ matrix.jsc }}
     - name: Build
       uses: SusanDoggie/swift-action@main
       with:
@@ -139,6 +140,7 @@ jobs:
         include:
           - distro: centos8
             jsc: webkit2gtk3-jsc-devel
+            allowerasing: --allowerasing
           - distro: amazonlinux2
             jsc: webkitgtk4-jsc-devel
     steps:
@@ -146,7 +148,7 @@ jobs:
       with:
         submodules: recursive
     - name: Install dependencies
-      run: yum update -y --allowerasing && yum install -y ${{ matrix.jsc }}
+      run: yum update -y ${{ matrix.allowerasing }} && yum install -y ${{ matrix.jsc }}
     - name: Build
       uses: SusanDoggie/swift-action@main
       with:
