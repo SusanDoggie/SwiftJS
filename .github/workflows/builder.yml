@@ -52,44 +52,17 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        swift_version: [5.3, 5.4, 5.5]
+        swift_version: [5.3, 5.4, 5.5, 5.6]
         distro: [xenial, bionic, focal]
+        exclude:
+          - swift_version: 5.6
+            distro: xenial
     steps:
     - uses: actions/checkout@v1
       with:
         submodules: recursive
     - name: Install dependencies
       run: apt-get update && apt-get install -y libjavascriptcoregtk-4.0-dev
-    - name: Build
-      uses: SusanDoggie/swift-action@main
-      with:
-        action: build
-    - name: Run tests
-      uses: SusanDoggie/swift-action@main
-      with:
-        action: test
-  linux_swift:
-    name: ${{ matrix.swift_version }}-${{ matrix.distro }}
-    container:
-      image: docker://swift:${{ matrix.swift_version }}-${{ matrix.distro }}
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        swift_version: [5.3, 5.4, 5.5]
-        distro: [centos8, amazonlinux2]
-        include:
-          - distro: centos8
-            jsc: webkit2gtk3-jsc-devel
-            allowerasing: --allowerasing
-          - distro: amazonlinux2
-            jsc: webkitgtk4-jsc-devel
-    steps:
-    - uses: actions/checkout@v1
-      with:
-        submodules: recursive
-    - name: Install dependencies
-      run: yum update -y ${{ matrix.allowerasing }} && yum install -y ${{ matrix.jsc }}
     - name: Build
       uses: SusanDoggie/swift-action@main
       with:
@@ -107,48 +80,14 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        swift_version: [5.6, main]
-        distro: [xenial, bionic, focal]
-        exclude:
-          - swift_version: main
-            distro: xenial
+        swift_version: [main]
+        distro: [bionic, focal]
     steps:
     - uses: actions/checkout@v1
       with:
         submodules: recursive
     - name: Install dependencies
       run: apt-get update && apt-get install -y libjavascriptcoregtk-4.0-dev
-    - name: Build
-      uses: SusanDoggie/swift-action@main
-      with:
-        action: build
-    - name: Run tests
-      uses: SusanDoggie/swift-action@main
-      with:
-        action: test
-  linux_swift_nightly:
-    name: nightly-${{ matrix.swift_version }}-${{ matrix.distro }}
-    container:
-      image: docker://swiftlang/swift:nightly-${{ matrix.swift_version }}-${{ matrix.distro }}
-    runs-on: ubuntu-latest
-    continue-on-error: true
-    strategy:
-      fail-fast: false
-      matrix:
-        swift_version: [5.6, main]
-        distro: [centos8, amazonlinux2]
-        include:
-          - distro: centos8
-            jsc: webkit2gtk3-jsc-devel
-            allowerasing: --allowerasing
-          - distro: amazonlinux2
-            jsc: webkitgtk4-jsc-devel
-    steps:
-    - uses: actions/checkout@v1
-      with:
-        submodules: recursive
-    - name: Install dependencies
-      run: yum update -y ${{ matrix.allowerasing }} && yum install -y ${{ matrix.jsc }}
     - name: Build
       uses: SusanDoggie/swift-action@main
       with:
