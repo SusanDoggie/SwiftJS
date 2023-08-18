@@ -31,7 +31,7 @@ jobs:
       destination: ${{ matrix.destination }}
       enable_codecov: ${{ matrix.enable_codecov }}
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v3
       with:
         submodules: recursive
     - name: Build
@@ -68,7 +68,7 @@ jobs:
           - swift_version: 5.6
             distro: jammy
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v3
       with:
         submodules: recursive
     - name: Install dependencies
@@ -93,7 +93,7 @@ jobs:
         swift_version: [main]
         distro: [bionic, focal, jammy]
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v3
       with:
         submodules: recursive
     - name: Install dependencies
