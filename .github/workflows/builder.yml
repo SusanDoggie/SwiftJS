@@ -52,12 +52,22 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        swift_version: [5.3, 5.4, 5.5, 5.6, 5.7]
+        swift_version: [5.3, 5.4, 5.5, 5.6, 5.7, 5.8, 5.9, 5.10]
         distro: [xenial, bionic, focal, jammy]
         exclude:
+          - swift_version: 5.9
+            distro: bionic
+          - swift_version: 5.10
+            distro: bionic
           - swift_version: 5.6
             distro: xenial
           - swift_version: 5.7
+            distro: xenial
+          - swift_version: 5.8
+            distro: xenial
+          - swift_version: 5.9
+            distro: xenial
+          - swift_version: 5.10
             distro: xenial
           - swift_version: 5.3
             distro: jammy
@@ -91,7 +101,7 @@ jobs:
       fail-fast: false
       matrix:
         swift_version: [main]
-        distro: [bionic, focal, jammy]
+        distro: [focal, jammy]
     steps:
     - uses: actions/checkout@v3
       with:
